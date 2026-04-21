@@ -18,6 +18,7 @@
 		52C4DB91CBBA5493473599F5 /* Checkpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57184745183BD20F7A030540 /* Checkpoint.swift */; };
 		5350D3F5D5A99BA7EA7A11AA /* LiveResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05582D2ABC74A8EA44211425 /* LiveResultsView.swift */; };
 		6ECDD6C2A2E71AB4DCA9B228 /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E010C00EF6695556847F7F /* AppNavigation.swift */; };
+		82B3DC98D280BE9CE34414EA /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41155EBC724D451E7AB71DB3 /* SessionDetailView.swift */; };
 		878C3B4F19F896DA904B73F9 /* SyncEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9236A26BF64331C37B21D16 /* SyncEvent.swift */; };
 		96D53189969BC423207B67AB /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4798E2C7B2AF32419F529B /* SessionStore.swift */; };
 		9815E6461132B7DE47A85718 /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C6FEF5E9905860F146265B /* DeviceInfo.swift */; };
@@ -49,6 +50,7 @@
 		22D6964744270E4F55C88B27 /* CheckpointCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckpointCaptureView.swift; sourceTree = "<group>"; };
 		34B57679718CE39083DDF759 /* ReviewAndCorrectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewAndCorrectView.swift; sourceTree = "<group>"; };
 		3C3F65EBD3C88FD95FFB5DD4 /* RaceTimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaceTimerApp.swift; sourceTree = "<group>"; };
+		41155EBC724D451E7AB71DB3 /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 		48FCA7158FFCA725BEF056AD /* CheckpointEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckpointEvent.swift; sourceTree = "<group>"; };
 		57184745183BD20F7A030540 /* Checkpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkpoint.swift; sourceTree = "<group>"; };
 		5C4798E2C7B2AF32419F529B /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 		DC1064E9C435EEBFF49ED427 /* SessionSetup */ = {
 			isa = PBXGroup;
 			children = (
+				41155EBC724D451E7AB71DB3 /* SessionDetailView.swift */,
 				B6AF740B1C5E85DE87555C47 /* SessionSetupView.swift */,
 			);
 			path = SessionSetup;
@@ -325,6 +328,7 @@
 				E16837E68F596B3488D12CAB /* RoleSelectionView.swift in Sources */,
 				C608FB5B1B07D44510E1F42E /* Run.swift in Sources */,
 				46446B331C837BD48BBAEA89 /* Session.swift in Sources */,
+				82B3DC98D280BE9CE34414EA /* SessionDetailView.swift in Sources */,
 				2B927234810E60C1D4886597 /* SessionSetupView.swift in Sources */,
 				96D53189969BC423207B67AB /* SessionStore.swift in Sources */,
 				30FB443905C0EEDA81C37336 /* StartLineView.swift in Sources */,

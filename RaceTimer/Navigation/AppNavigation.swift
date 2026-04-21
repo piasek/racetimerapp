@@ -2,13 +2,14 @@ import SwiftUI
 
 enum Route: Hashable {
     case sessionSetup
-    case roleSelection
-    case startLine
-    case checkpointCapture
-    case finishLine
-    case liveResults
-    case reviewAndCorrect
-    case export
+    case sessionDetail(UUID)
+    case roleSelection(UUID)
+    case startLine(UUID)
+    case checkpointCapture(UUID)
+    case finishLine(UUID)
+    case liveResults(UUID)
+    case reviewAndCorrect(UUID)
+    case export(UUID)
 }
 
 struct AppNavigation: View {
@@ -21,8 +22,10 @@ struct AppNavigation: View {
                     switch route {
                     case .sessionSetup:
                         SessionSetupView(path: $path)
-                    case .roleSelection:
-                        RoleSelectionView(path: $path)
+                    case .sessionDetail(let id):
+                        SessionDetailView(path: $path, sessionId: id)
+                    case .roleSelection(let id):
+                        RoleSelectionView(path: $path, sessionId: id)
                     case .startLine:
                         StartLineView()
                     case .checkpointCapture:
