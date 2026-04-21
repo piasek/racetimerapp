@@ -1,0 +1,526 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2B927234810E60C1D4886597 /* SessionSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AF740B1C5E85DE87555C47 /* SessionSetupView.swift */; };
+		2C9810E4AD37E587F5460BCB /* RaceTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC2CAEC615E0CA225879BB1 /* RaceTimerTests.swift */; };
+		30E8798A4DBF6C3C6546BB8D /* RaceTimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3F65EBD3C88FD95FFB5DD4 /* RaceTimerApp.swift */; };
+		30FB443905C0EEDA81C37336 /* StartLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB545205B6C6FBB332F7BBA7 /* StartLineView.swift */; };
+		4CA698BBEB60511EFFF7FBE6 /* ReviewAndCorrectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34B57679718CE39083DDF759 /* ReviewAndCorrectView.swift */; };
+		5350D3F5D5A99BA7EA7A11AA /* LiveResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05582D2ABC74A8EA44211425 /* LiveResultsView.swift */; };
+		6ECDD6C2A2E71AB4DCA9B228 /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E010C00EF6695556847F7F /* AppNavigation.swift */; };
+		9A5EC3E3D46B08A0B7958C63 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F4D039D397E0904D694D11 /* ExportView.swift */; };
+		B8043D147542608B2FDF2A96 /* FinishLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 199E07971589CF2F41FFD300 /* FinishLineView.swift */; };
+		E16837E68F596B3488D12CAB /* RoleSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE0B4E159961CA8F03C24F3 /* RoleSelectionView.swift */; };
+		F017988435FE8DD3C5B2F8B3 /* CheckpointCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D6964744270E4F55C88B27 /* CheckpointCaptureView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0A6A9EC02053471B9B6DF73F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 054FB3FB60CB2F499FBBCE5F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 14237D3F7B7B1EC60BB1B949;
+			remoteInfo = RaceTimer;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		05582D2ABC74A8EA44211425 /* LiveResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveResultsView.swift; sourceTree = "<group>"; };
+		199E07971589CF2F41FFD300 /* FinishLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinishLineView.swift; sourceTree = "<group>"; };
+		19E010C00EF6695556847F7F /* AppNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigation.swift; sourceTree = "<group>"; };
+		1DE0B4E159961CA8F03C24F3 /* RoleSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoleSelectionView.swift; sourceTree = "<group>"; };
+		22D6964744270E4F55C88B27 /* CheckpointCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckpointCaptureView.swift; sourceTree = "<group>"; };
+		34B57679718CE39083DDF759 /* ReviewAndCorrectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewAndCorrectView.swift; sourceTree = "<group>"; };
+		3C3F65EBD3C88FD95FFB5DD4 /* RaceTimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaceTimerApp.swift; sourceTree = "<group>"; };
+		828ED7C247A0877BA6E4E39C /* RaceTimer.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RaceTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8BC2CAEC615E0CA225879BB1 /* RaceTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaceTimerTests.swift; sourceTree = "<group>"; };
+		B6AF740B1C5E85DE87555C47 /* SessionSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSetupView.swift; sourceTree = "<group>"; };
+		C75FD7D4B915630D4D6E46E7 /* RaceTimerTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RaceTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1F4D039D397E0904D694D11 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
+		DB545205B6C6FBB332F7BBA7 /* StartLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartLineView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		22F53C2915394C27B30EC742 /* RoleSelection */ = {
+			isa = PBXGroup;
+			children = (
+				1DE0B4E159961CA8F03C24F3 /* RoleSelectionView.swift */,
+			);
+			path = RoleSelection;
+			sourceTree = "<group>";
+		};
+		38E0CD8C388AC7ED184D1A93 /* StartLine */ = {
+			isa = PBXGroup;
+			children = (
+				DB545205B6C6FBB332F7BBA7 /* StartLineView.swift */,
+			);
+			path = StartLine;
+			sourceTree = "<group>";
+		};
+		499317E56B968EB0938CD1BC /* RaceTimerTests */ = {
+			isa = PBXGroup;
+			children = (
+				8BC2CAEC615E0CA225879BB1 /* RaceTimerTests.swift */,
+			);
+			path = RaceTimerTests;
+			sourceTree = "<group>";
+		};
+		5DE6966C0299370EBEB3E5B7 /* FinishLine */ = {
+			isa = PBXGroup;
+			children = (
+				199E07971589CF2F41FFD300 /* FinishLineView.swift */,
+			);
+			path = FinishLine;
+			sourceTree = "<group>";
+		};
+		6B38A02256A18113090CD8F2 /* ReviewAndCorrect */ = {
+			isa = PBXGroup;
+			children = (
+				34B57679718CE39083DDF759 /* ReviewAndCorrectView.swift */,
+			);
+			path = ReviewAndCorrect;
+			sourceTree = "<group>";
+		};
+		826D8D36751C5B861DB5B7A2 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				D1F4D039D397E0904D694D11 /* ExportView.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
+		8387C624C651EED4B3B43727 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				828ED7C247A0877BA6E4E39C /* RaceTimer.app */,
+				C75FD7D4B915630D4D6E46E7 /* RaceTimerTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A60EC02863887ABB50E5F0F7 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				3C3F65EBD3C88FD95FFB5DD4 /* RaceTimerApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		AEBE7749D0F5B026FE0AF911 /* CheckpointCapture */ = {
+			isa = PBXGroup;
+			children = (
+				22D6964744270E4F55C88B27 /* CheckpointCaptureView.swift */,
+			);
+			path = CheckpointCapture;
+			sourceTree = "<group>";
+		};
+		C86A83933247183D0542CA8D /* RaceTimer */ = {
+			isa = PBXGroup;
+			children = (
+				A60EC02863887ABB50E5F0F7 /* App */,
+				DB897FE67AAAD3EBD4B3EBDC /* Features */,
+				CB4FE49AA0612B9A3CF4E1BF /* Navigation */,
+			);
+			path = RaceTimer;
+			sourceTree = "<group>";
+		};
+		CB4FE49AA0612B9A3CF4E1BF /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				19E010C00EF6695556847F7F /* AppNavigation.swift */,
+			);
+			path = Navigation;
+			sourceTree = "<group>";
+		};
+		DB897FE67AAAD3EBD4B3EBDC /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				AEBE7749D0F5B026FE0AF911 /* CheckpointCapture */,
+				826D8D36751C5B861DB5B7A2 /* Export */,
+				5DE6966C0299370EBEB3E5B7 /* FinishLine */,
+				E0CCF5707FDB10E3480215D6 /* LiveResults */,
+				6B38A02256A18113090CD8F2 /* ReviewAndCorrect */,
+				22F53C2915394C27B30EC742 /* RoleSelection */,
+				DC1064E9C435EEBFF49ED427 /* SessionSetup */,
+				38E0CD8C388AC7ED184D1A93 /* StartLine */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		DC1064E9C435EEBFF49ED427 /* SessionSetup */ = {
+			isa = PBXGroup;
+			children = (
+				B6AF740B1C5E85DE87555C47 /* SessionSetupView.swift */,
+			);
+			path = SessionSetup;
+			sourceTree = "<group>";
+		};
+		E0CCF5707FDB10E3480215D6 /* LiveResults */ = {
+			isa = PBXGroup;
+			children = (
+				05582D2ABC74A8EA44211425 /* LiveResultsView.swift */,
+			);
+			path = LiveResults;
+			sourceTree = "<group>";
+		};
+		E6C7877446765F3C1ABB959A = {
+			isa = PBXGroup;
+			children = (
+				C86A83933247183D0542CA8D /* RaceTimer */,
+				499317E56B968EB0938CD1BC /* RaceTimerTests */,
+				8387C624C651EED4B3B43727 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		14237D3F7B7B1EC60BB1B949 /* RaceTimer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 487C36094A0D3ACEFD9FD3B8 /* Build configuration list for PBXNativeTarget "RaceTimer" */;
+			buildPhases = (
+				9A0DDCF8CCBA3FA10D99F24C /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = RaceTimer;
+			packageProductDependencies = (
+			);
+			productName = RaceTimer;
+			productReference = 828ED7C247A0877BA6E4E39C /* RaceTimer.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7D5F04AAF9B2C653F890DA7D /* RaceTimerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5516A2F02435CECF8328CB7C /* Build configuration list for PBXNativeTarget "RaceTimerTests" */;
+			buildPhases = (
+				90FD55AAE449C5B91CA393C2 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE6A29EB6A96BCDCDAC6A7BD /* PBXTargetDependency */,
+			);
+			name = RaceTimerTests;
+			packageProductDependencies = (
+			);
+			productName = RaceTimerTests;
+			productReference = C75FD7D4B915630D4D6E46E7 /* RaceTimerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		054FB3FB60CB2F499FBBCE5F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					14237D3F7B7B1EC60BB1B949 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = C89133DBBD2AA2DA10F0C91D /* Build configuration list for PBXProject "RaceTimer" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = E6C7877446765F3C1ABB959A;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 8387C624C651EED4B3B43727 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				14237D3F7B7B1EC60BB1B949 /* RaceTimer */,
+				7D5F04AAF9B2C653F890DA7D /* RaceTimerTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		90FD55AAE449C5B91CA393C2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C9810E4AD37E587F5460BCB /* RaceTimerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9A0DDCF8CCBA3FA10D99F24C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6ECDD6C2A2E71AB4DCA9B228 /* AppNavigation.swift in Sources */,
+				F017988435FE8DD3C5B2F8B3 /* CheckpointCaptureView.swift in Sources */,
+				9A5EC3E3D46B08A0B7958C63 /* ExportView.swift in Sources */,
+				B8043D147542608B2FDF2A96 /* FinishLineView.swift in Sources */,
+				5350D3F5D5A99BA7EA7A11AA /* LiveResultsView.swift in Sources */,
+				30E8798A4DBF6C3C6546BB8D /* RaceTimerApp.swift in Sources */,
+				4CA698BBEB60511EFFF7FBE6 /* ReviewAndCorrectView.swift in Sources */,
+				E16837E68F596B3488D12CAB /* RoleSelectionView.swift in Sources */,
+				2B927234810E60C1D4886597 /* SessionSetupView.swift in Sources */,
+				30FB443905C0EEDA81C37336 /* StartLineView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FE6A29EB6A96BCDCDAC6A7BD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 14237D3F7B7B1EC60BB1B949 /* RaceTimer */;
+			targetProxy = 0A6A9EC02053471B9B6DF73F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		09C857BF95128CCC78AAB66E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		404D3AD4AE2DF41A8FA74227 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RaceTimer;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.racetimerapp.RaceTimer;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		732C5D5416E1ECE23CDD8353 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		B7DA6081BBE879EBAA4668F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RaceTimer;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.racetimerapp.RaceTimer;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C316B2034327F2099B859F66 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.racetimerapp.RaceTimerTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RaceTimer.app/RaceTimer";
+			};
+			name = Release;
+		};
+		D54C6F0885FD788F63B3FB02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.racetimerapp.RaceTimerTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RaceTimer.app/RaceTimer";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		487C36094A0D3ACEFD9FD3B8 /* Build configuration list for PBXNativeTarget "RaceTimer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7DA6081BBE879EBAA4668F4 /* Debug */,
+				404D3AD4AE2DF41A8FA74227 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5516A2F02435CECF8328CB7C /* Build configuration list for PBXNativeTarget "RaceTimerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D54C6F0885FD788F63B3FB02 /* Debug */,
+				C316B2034327F2099B859F66 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C89133DBBD2AA2DA10F0C91D /* Build configuration list for PBXProject "RaceTimer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				732C5D5416E1ECE23CDD8353 /* Debug */,
+				09C857BF95128CCC78AAB66E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 054FB3FB60CB2F499FBBCE5F /* Project object */;
+}
