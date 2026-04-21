@@ -64,18 +64,9 @@ struct FinishLineView: View {
             }
 
             // Big finish button
-            Button {
+            CaptureButton(title: "Rider Finished", color: .red) {
                 recordFinish()
-            } label: {
-                Text("Rider Finished")
-                    .font(.title2.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.red)
-            .controlSize(.large)
-            .padding()
         }
         .navigationTitle("Finish Line")
         .onAppear { loadData() }

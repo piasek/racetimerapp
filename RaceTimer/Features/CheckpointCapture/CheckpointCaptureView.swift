@@ -43,18 +43,9 @@ struct CheckpointCaptureView: View {
             }
 
             // Big capture button
-            Button {
+            CaptureButton(title: "Rider Passed", color: .orange) {
                 capturePass()
-            } label: {
-                Text("Rider Passed")
-                    .font(.title2.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
-            .controlSize(.large)
-            .padding()
         }
         .navigationTitle(checkpoint?.name ?? "Checkpoint")
         .onAppear { loadData() }

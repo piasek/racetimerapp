@@ -64,19 +64,10 @@ struct StartLineView: View {
             }
 
             // Big send button
-            Button {
+            CaptureButton(title: "Send Rider", color: .green) {
                 sendNextRider()
-            } label: {
-                Text("Send Rider")
-                    .font(.title2.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.green)
-            .controlSize(.large)
             .disabled(riderQueue.isEmpty)
-            .padding()
         }
         .navigationTitle("Start Line")
         .onAppear { loadSession() }
