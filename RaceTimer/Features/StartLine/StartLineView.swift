@@ -1,33 +1,160 @@
 import SwiftUI
+import SwiftData
 
 struct StartLineView: View {
+    let sessionId: UUID
+
+    @Environment(\.modelContext) private var modelContext
+    @Environment(RoleCoordinator.self) private var roleCoordinator
+
+    @State private var session: Session?
+    @State private var riderQueue: [Rider] = []
+    @State private var lastSendTime: Date?
+    @State private var elapsedSinceLastSend: TimeInterval = 0
+    @State private var timer: Timer?
+
+    private let minimumGap: TimeInterval = 30
+
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
+        VStack(spacing: 0) {
+            // Interval-since-last-start banner
+            if lastSendTime != nil {
+                gapBanner
+            }
 
-            Image(systemName: "flag.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.green)
+            List {
+                Section("Next Up") {
+                    if riderQueue.isEmpty {
+                        Text("All riders have been sent.")
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(riderQueue) { rider in
+                        HStack {
+                            Text(rider.displayName)
+                            Spacer()
+                            if rider.id == riderQueue.first?.id {
+                                Text("NEXT")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 2)
+                                    .background(.green, in: Capsule())
+                            }
+                        }
+                    }
+                }
 
-            Text("Start Line")
-                .font(.title.bold())
+                if let session {
+                    Section("Sent (\(sentRuns(session).count))") {
+                        ForEach(sentRuns(session), id: \.id) { run in
+                            if let rider = run.rider {
+                                HStack {
+                                    Text(rider.displayName)
+                                    Spacer()
+                                    if let start = run.startTime {
+                                        Text(start, style: .time)
+                                            .font(.caption.monospacedDigit())
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-            Text("Queue riders and send them off.")
-                .foregroundStyle(.secondary)
-
+            // Big send button
             Button {
-                // TODO: Send rider action
+                sendNextRider()
             } label: {
                 Text("Send Rider")
+                    .font(.title2.bold())
                     .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
             }
             .buttonStyle(.borderedProminent)
-            .controlSize(.large)
             .tint(.green)
+            .controlSize(.large)
+            .disabled(riderQueue.isEmpty)
+            .padding()
+        }
+        .navigationTitle("Start Line")
+        .onAppear { loadSession() }
+        .onDisappear { timer?.invalidate() }
+    }
 
+    // MARK: - Gap banner
+
+    private var gapBanner: some View {
+        HStack {
+            Image(systemName: elapsedSinceLastSend < minimumGap ? "exclamationmark.triangle.fill" : "clock")
+                .foregroundStyle(elapsedSinceLastSend < minimumGap ? .yellow : .green)
+            Text("Since last: \(formattedInterval(elapsedSinceLastSend))")
+                .monospacedDigit()
             Spacer()
         }
-        .padding()
-        .navigationTitle("Start Line")
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(elapsedSinceLastSend < minimumGap ? Color.yellow.opacity(0.15) : Color.green.opacity(0.10))
+    }
+
+    // MARK: - Actions
+
+    private func sendNextRider() {
+        guard let session, let rider = riderQueue.first else { return }
+        let startCheckpoint = session.sortedCheckpoints.first { $0.isStart }
+        guard let cp = startCheckpoint else { return }
+
+        let run = Run(status: .started)
+        run.rider = rider
+        run.session = session
+        modelContext.insert(run)
+
+        let event = CheckpointEvent(
+            timestamp: .now,
+            recordedByDeviceId: roleCoordinator.deviceId
+        )
+        event.run = run
+        event.checkpoint = cp
+        modelContext.insert(event)
+
+        lastSendTime = .now
+        startGapTimer()
+        rebuildQueue()
+    }
+
+    private func startGapTimer() {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            if let last = lastSendTime {
+                elapsedSinceLastSend = Date.now.timeIntervalSince(last)
+            }
+        }
+    }
+
+    // MARK: - Data
+
+    private func loadSession() {
+        let id = sessionId
+        let descriptor = FetchDescriptor<Session>(predicate: #Predicate { $0.id == id })
+        session = try? modelContext.fetch(descriptor).first
+        rebuildQueue()
+    }
+
+    private func rebuildQueue() {
+        guard let session else { riderQueue = []; return }
+        let sentRiderIds = Set(session.runs.compactMap { $0.rider?.id })
+        riderQueue = session.riders.filter { !sentRiderIds.contains($0.id) }
+    }
+
+    private func sentRuns(_ session: Session) -> [Run] {
+        session.runs
+            .filter { $0.status == .started || $0.status == .finished }
+            .sorted { ($0.startTime ?? .distantPast) > ($1.startTime ?? .distantPast) }
+    }
+
+    private func formattedInterval(_ interval: TimeInterval) -> String {
+        let s = Int(interval)
+        return String(format: "%d:%02d", s / 60, s % 60)
     }
 }

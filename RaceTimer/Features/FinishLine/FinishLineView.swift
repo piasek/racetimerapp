@@ -1,33 +1,163 @@
 import SwiftUI
+import SwiftData
 
+/// Finish line is a specialised checkpoint capture at the last checkpoint.
 struct FinishLineView: View {
+    let sessionId: UUID
+
+    @Environment(\.modelContext) private var modelContext
+    @Environment(RoleCoordinator.self) private var roleCoordinator
+
+    @State private var session: Session?
+    @State private var finishCheckpoint: Checkpoint?
+    @State private var recentFinishes: [FinishRecord] = []
+    @State private var expectedRiders: [Rider] = []
+
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
+        VStack(spacing: 0) {
+            // Expected
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Expected Next")
+                    .font(.caption.bold())
+                    .foregroundStyle(.secondary)
+                if expectedRiders.isEmpty {
+                    Text("No riders en route")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(expectedRiders.prefix(3)) { rider in
+                        HStack {
+                            if rider.id == expectedRiders.first?.id {
+                                Image(systemName: "arrow.right.circle.fill")
+                                    .foregroundStyle(.red)
+                            }
+                            Text(rider.displayName)
+                                .font(.subheadline)
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding()
+            .background(.ultraThinMaterial)
 
-            Image(systemName: "flag.checkered")
-                .font(.system(size: 64))
-                .foregroundStyle(.red)
+            Divider()
 
-            Text("Finish Line")
-                .font(.title.bold())
+            // Recent finishes
+            List {
+                Section("Finished (\(recentFinishes.count))") {
+                    ForEach(recentFinishes) { record in
+                        HStack {
+                            Text(record.riderName)
+                            Spacer()
+                            if let total = record.totalTime {
+                                Text(formattedTime(total))
+                                    .font(.body.monospacedDigit().bold())
+                            }
+                            Text(record.timestamp, style: .time)
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .onDelete(perform: deleteFinish)
+                }
+            }
 
-            Text("Tap when a rider finishes.")
-                .foregroundStyle(.secondary)
-
+            // Big finish button
             Button {
-                // TODO: Record finish action
+                recordFinish()
             } label: {
                 Text("Rider Finished")
+                    .font(.title2.bold())
                     .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
             }
             .buttonStyle(.borderedProminent)
-            .controlSize(.large)
             .tint(.red)
-
-            Spacer()
+            .controlSize(.large)
+            .padding()
         }
-        .padding()
         .navigationTitle("Finish Line")
+        .onAppear { loadData() }
     }
+
+    // MARK: - Actions
+
+    private func recordFinish() {
+        guard let session, let cp = finishCheckpoint else { return }
+        let timestamp = Date.now
+        let expectedRider = expectedRiders.first
+        let run = session.runs.first { $0.rider?.id == expectedRider?.id && $0.status == .started }
+
+        let event = CheckpointEvent(
+            timestamp: timestamp,
+            recordedByDeviceId: roleCoordinator.deviceId,
+            autoAssignedRiderId: expectedRider?.id
+        )
+        event.run = run
+        event.checkpoint = cp
+        modelContext.insert(event)
+
+        if let run {
+            run.status = .finished
+        }
+
+        let record = FinishRecord(
+            id: event.id,
+            riderName: expectedRider?.displayName ?? "Unknown",
+            timestamp: timestamp,
+            totalTime: run?.totalTime
+        )
+        recentFinishes.insert(record, at: 0)
+        rebuildExpected()
+    }
+
+    private func deleteFinish(at offsets: IndexSet) {
+        for index in offsets {
+            let record = recentFinishes[index]
+            let eid = record.id
+            let descriptor = FetchDescriptor<CheckpointEvent>(predicate: #Predicate { $0.id == eid })
+            if let event = try? modelContext.fetch(descriptor).first {
+                event.deleted = true
+            }
+        }
+        recentFinishes.remove(atOffsets: offsets)
+        rebuildExpected()
+    }
+
+    // MARK: - Data
+
+    private func loadData() {
+        let sid = sessionId
+        let descriptor = FetchDescriptor<Session>(predicate: #Predicate { $0.id == sid })
+        session = try? modelContext.fetch(descriptor).first
+        finishCheckpoint = session?.sortedCheckpoints.last { $0.isFinish }
+        rebuildExpected()
+    }
+
+    private func rebuildExpected() {
+        guard let session else { expectedRiders = []; return }
+        let finishedRiderIds = Set(
+            session.runs.filter { $0.status == .finished }.compactMap { $0.rider?.id }
+        )
+        expectedRiders = session.runs
+            .filter { $0.status == .started }
+            .compactMap { $0.rider }
+            .filter { !finishedRiderIds.contains($0.id) }
+            .sorted { ($0.runs.first?.startTime ?? .distantFuture) < ($1.runs.first?.startTime ?? .distantFuture) }
+    }
+
+    private func formattedTime(_ interval: TimeInterval) -> String {
+        let m = Int(interval) / 60
+        let s = Int(interval) % 60
+        let ms = Int((interval.truncatingRemainder(dividingBy: 1)) * 10)
+        return String(format: "%d:%02d.%d", m, s, ms)
+    }
+}
+
+private struct FinishRecord: Identifiable {
+    let id: UUID
+    let riderName: String
+    let timestamp: Date
+    let totalTime: TimeInterval?
 }

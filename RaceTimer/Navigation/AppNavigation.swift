@@ -27,18 +27,18 @@ struct AppNavigation: View {
                         SessionDetailView(path: $path, sessionId: id)
                     case .roleSelection(let id):
                         RoleSelectionView(path: $path, sessionId: id)
-                    case .startLine:
-                        StartLineView()
-                    case .checkpointCapture:
-                        CheckpointCaptureView()
-                    case .finishLine:
-                        FinishLineView()
-                    case .liveResults:
-                        LiveResultsView()
-                    case .reviewAndCorrect:
-                        ReviewAndCorrectView()
-                    case .export:
-                        ExportView()
+                    case .startLine(let id):
+                        StartLineView(sessionId: id)
+                    case .checkpointCapture(let sid, let cpId):
+                        CheckpointCaptureView(sessionId: sid, checkpointId: cpId)
+                    case .finishLine(let id):
+                        FinishLineView(sessionId: id)
+                    case .liveResults(let id):
+                        LiveResultsView(sessionId: id)
+                    case .reviewAndCorrect(let id):
+                        ReviewAndCorrectView(sessionId: id)
+                    case .export(let id):
+                        ExportView(sessionId: id)
                     }
                 }
         }
