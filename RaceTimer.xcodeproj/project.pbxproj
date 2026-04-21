@@ -17,6 +17,7 @@
 		5023EA5ED51D244F4D32ED05 /* Rider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E582733E2F9B11E94FC3BD0F /* Rider.swift */; };
 		52C4DB91CBBA5493473599F5 /* Checkpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57184745183BD20F7A030540 /* Checkpoint.swift */; };
 		5350D3F5D5A99BA7EA7A11AA /* LiveResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05582D2ABC74A8EA44211425 /* LiveResultsView.swift */; };
+		54A9CE1E95B29BAE07224B76 /* RoleCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BCB92E91E4C18FDE72574A /* RoleCoordinator.swift */; };
 		6ECDD6C2A2E71AB4DCA9B228 /* AppNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19E010C00EF6695556847F7F /* AppNavigation.swift */; };
 		82B3DC98D280BE9CE34414EA /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41155EBC724D451E7AB71DB3 /* SessionDetailView.swift */; };
 		878C3B4F19F896DA904B73F9 /* SyncEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9236A26BF64331C37B21D16 /* SyncEvent.swift */; };
@@ -60,6 +61,7 @@
 		9F7FBFF4EBE86AB02BEF4F4E /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		A8C6FEF5E9905860F146265B /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
 		B6AF740B1C5E85DE87555C47 /* SessionSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSetupView.swift; sourceTree = "<group>"; };
+		B7BCB92E91E4C18FDE72574A /* RoleCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoleCoordinator.swift; sourceTree = "<group>"; };
 		C75FD7D4B915630D4D6E46E7 /* RaceTimerTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RaceTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1F4D039D397E0904D694D11 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
 		D9236A26BF64331C37B21D16 /* SyncEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEvent.swift; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				FC113525837751982C062FE7 /* ProjectionEngine.swift */,
+				B7BCB92E91E4C18FDE72574A /* RoleCoordinator.swift */,
 				5C4798E2C7B2AF32419F529B /* SessionStore.swift */,
 			);
 			path = Services;
@@ -325,6 +328,7 @@
 				30E8798A4DBF6C3C6546BB8D /* RaceTimerApp.swift in Sources */,
 				4CA698BBEB60511EFFF7FBE6 /* ReviewAndCorrectView.swift in Sources */,
 				5023EA5ED51D244F4D32ED05 /* Rider.swift in Sources */,
+				54A9CE1E95B29BAE07224B76 /* RoleCoordinator.swift in Sources */,
 				E16837E68F596B3488D12CAB /* RoleSelectionView.swift in Sources */,
 				C608FB5B1B07D44510E1F42E /* Run.swift in Sources */,
 				46446B331C837BD48BBAEA89 /* Session.swift in Sources */,

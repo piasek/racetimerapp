@@ -5,7 +5,7 @@ enum Route: Hashable {
     case sessionDetail(UUID)
     case roleSelection(UUID)
     case startLine(UUID)
-    case checkpointCapture(UUID)
+    case checkpointCapture(UUID, checkpointId: UUID)
     case finishLine(UUID)
     case liveResults(UUID)
     case reviewAndCorrect(UUID)
@@ -14,6 +14,7 @@ enum Route: Hashable {
 
 struct AppNavigation: View {
     @State private var path = NavigationPath()
+    @State private var roleCoordinator = RoleCoordinator()
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -41,5 +42,6 @@ struct AppNavigation: View {
                     }
                 }
         }
+        .environment(roleCoordinator)
     }
 }
