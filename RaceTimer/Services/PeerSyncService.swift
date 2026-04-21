@@ -94,8 +94,9 @@ final class PeerSyncService: NSObject {
 
 extension PeerSyncService: MCSessionDelegate {
     nonisolated func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+        let peers = session.connectedPeers
         Task { @MainActor in
-            connectedPeers = session.connectedPeers
+            connectedPeers = peers
             switch state {
             case .connected:
                 logger.info("Peer connected: \(peerID.displayName)")
