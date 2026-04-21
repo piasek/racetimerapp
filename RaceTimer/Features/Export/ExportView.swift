@@ -95,9 +95,7 @@ struct ExportView: View {
     }
 
     private func loadSession() {
-        let sid = sessionId
-        let descriptor = FetchDescriptor<Session>(predicate: #Predicate { $0.id == sid })
-        session = try? modelContext.fetch(descriptor).first
+        session = try? modelContext.fetchByID(Session.self, id: sessionId)
     }
 
     private func formattedTime(_ interval: TimeInterval) -> String {

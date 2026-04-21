@@ -56,10 +56,7 @@ final class SyncEngine {
             receiveClock(transfer.lamportClock)
 
             // Check if we already have this event (idempotency)
-            let existingId = transfer.id
-            let descriptor = FetchDescriptor<SyncEvent>(predicate: #Predicate { $0.id == existingId })
-            if let existing = try context.fetch(descriptor).first {
-                _ = existing // already have it
+            if try context.fetchByID(SyncEvent.self, id: transfer.id) != nil {
                 continue
             }
 

@@ -116,9 +116,11 @@ struct StartLineView: View {
 
     private func startGapTimer() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
-            if let last = lastSendTime {
-                elapsedSinceLastSend = Date.now.timeIntervalSince(last)
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [self] _ in
+            Task { @MainActor in
+                if let last = self.lastSendTime {
+                    self.elapsedSinceLastSend = Date.now.timeIntervalSince(last)
+                }
             }
         }
     }
@@ -126,9 +128,7 @@ struct StartLineView: View {
     // MARK: - Data
 
     private func loadSession() {
-        let id = sessionId
-        let descriptor = FetchDescriptor<Session>(predicate: #Predicate { $0.id == id })
-        session = try? modelContext.fetch(descriptor).first
+        session = try? modelContext.fetchByID(Session.self, id: sessionId)
         rebuildQueue()
     }
 

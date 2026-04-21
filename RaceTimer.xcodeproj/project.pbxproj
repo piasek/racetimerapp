@@ -26,6 +26,7 @@
 		96D53189969BC423207B67AB /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C4798E2C7B2AF32419F529B /* SessionStore.swift */; };
 		9815E6461132B7DE47A85718 /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8C6FEF5E9905860F146265B /* DeviceInfo.swift */; };
 		9A5EC3E3D46B08A0B7958C63 /* ExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F4D039D397E0904D694D11 /* ExportView.swift */; };
+		A0DC473B475C0062DAA2A69F /* ModelContext+FetchByID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F92FA67FC148710D30A6C004 /* ModelContext+FetchByID.swift */; };
 		B5E3AEB8E293505A938246A1 /* SharedComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBC572EFA80506A03491841 /* SharedComponents.swift */; };
 		B8043D147542608B2FDF2A96 /* FinishLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 199E07971589CF2F41FFD300 /* FinishLineView.swift */; };
 		BFDACBC6BCF0F33ABCFAD3FB /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F7FBFF4EBE86AB02BEF4F4E /* ModelTests.swift */; };
@@ -77,10 +78,19 @@
 		D9236A26BF64331C37B21D16 /* SyncEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEvent.swift; sourceTree = "<group>"; };
 		DB545205B6C6FBB332F7BBA7 /* StartLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartLineView.swift; sourceTree = "<group>"; };
 		E582733E2F9B11E94FC3BD0F /* Rider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rider.swift; sourceTree = "<group>"; };
+		F92FA67FC148710D30A6C004 /* ModelContext+FetchByID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ModelContext+FetchByID.swift"; sourceTree = "<group>"; };
 		FC113525837751982C062FE7 /* ProjectionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectionEngine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		19A03EAA8928AB53EF163062 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				F92FA67FC148710D30A6C004 /* ModelContext+FetchByID.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		22F53C2915394C27B30EC742 /* RoleSelection */ = {
 			isa = PBXGroup;
 			children = (
@@ -196,6 +206,7 @@
 			children = (
 				A60EC02863887ABB50E5F0F7 /* App */,
 				4C6D3CC41AE534BF59F8292A /* Components */,
+				19A03EAA8928AB53EF163062 /* Extensions */,
 				DB897FE67AAAD3EBD4B3EBDC /* Features */,
 				2F325893C80D79F2AABB821D /* Models */,
 				CB4FE49AA0612B9A3CF4E1BF /* Navigation */,
@@ -349,6 +360,7 @@
 				9A5EC3E3D46B08A0B7958C63 /* ExportView.swift in Sources */,
 				B8043D147542608B2FDF2A96 /* FinishLineView.swift in Sources */,
 				5350D3F5D5A99BA7EA7A11AA /* LiveResultsView.swift in Sources */,
+				A0DC473B475C0062DAA2A69F /* ModelContext+FetchByID.swift in Sources */,
 				E84A455760882B180C48F580 /* PeerSyncService.swift in Sources */,
 				015F9C6F117C1A4D9007E98E /* ProjectionEngine.swift in Sources */,
 				30E8798A4DBF6C3C6546BB8D /* RaceTimerApp.swift in Sources */,

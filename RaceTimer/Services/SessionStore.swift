@@ -21,8 +21,8 @@ final class SessionStore: ObservableObject {
     }
 
     func fetchSessions() throws -> [Session] {
-        let descriptor = FetchDescriptor<Session>(sortBy: [SortDescriptor(\.date, order: .reverse)])
-        return try modelContext.fetch(descriptor)
+        let descriptor = FetchDescriptor<Session>()
+        return try modelContext.fetch(descriptor).sorted { $0.date > $1.date }
     }
 
     func deleteSession(_ session: Session) {

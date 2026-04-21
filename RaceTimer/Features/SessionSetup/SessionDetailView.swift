@@ -225,9 +225,7 @@ struct SessionDetailView: View {
     }
 
     private func loadSession() {
-        let id = sessionId
-        let descriptor = FetchDescriptor<Session>(predicate: #Predicate { $0.id == id })
-        session = try? modelContext.fetch(descriptor).first
+        session = try? modelContext.fetchByID(Session.self, id: sessionId)
         if let session {
             editedCourseName = session.courseName
             editedNotes = session.notes

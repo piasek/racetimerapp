@@ -107,8 +107,7 @@ struct FinishLineView: View {
         for index in offsets {
             let record = recentFinishes[index]
             let eid = record.id
-            let descriptor = FetchDescriptor<CheckpointEvent>(predicate: #Predicate { $0.id == eid })
-            if let event = try? modelContext.fetch(descriptor).first {
+            if let event = try? modelContext.fetchByID(CheckpointEvent.self, id: eid) {
                 event.deleted = true
             }
         }
@@ -119,9 +118,7 @@ struct FinishLineView: View {
     // MARK: - Data
 
     private func loadData() {
-        let sid = sessionId
-        let descriptor = FetchDescriptor<Session>(predicate: #Predicate { $0.id == sid })
-        session = try? modelContext.fetch(descriptor).first
+        session = try? modelContext.fetchByID(Session.self, id: sessionId)
         finishCheckpoint = session?.sortedCheckpoints.last { $0.isFinish }
         rebuildExpected()
     }

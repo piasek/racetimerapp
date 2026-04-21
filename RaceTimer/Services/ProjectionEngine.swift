@@ -106,22 +106,18 @@ struct ProjectionEngine {
     // MARK: - Fetch helpers
 
     private static func fetchRider(id: UUID, in context: ModelContext) throws -> Rider? {
-        let descriptor = FetchDescriptor<Rider>(predicate: #Predicate { $0.id == id })
-        return try context.fetch(descriptor).first
+        try context.fetchByID(Rider.self, id: id)
     }
 
     private static func fetchRun(id: UUID, in context: ModelContext) throws -> Run? {
-        let descriptor = FetchDescriptor<Run>(predicate: #Predicate { $0.id == id })
-        return try context.fetch(descriptor).first
+        try context.fetchByID(Run.self, id: id)
     }
 
     private static func fetchCheckpoint(id: UUID, in context: ModelContext) throws -> Checkpoint? {
-        let descriptor = FetchDescriptor<Checkpoint>(predicate: #Predicate { $0.id == id })
-        return try context.fetch(descriptor).first
+        try context.fetchByID(Checkpoint.self, id: id)
     }
 
     private static func fetchCheckpointEvent(id: UUID, in context: ModelContext) throws -> CheckpointEvent? {
-        let descriptor = FetchDescriptor<CheckpointEvent>(predicate: #Predicate { $0.id == id })
-        return try context.fetch(descriptor).first
+        try context.fetchByID(CheckpointEvent.self, id: id)
     }
 }

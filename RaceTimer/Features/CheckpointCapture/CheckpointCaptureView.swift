@@ -148,8 +148,7 @@ struct CheckpointCaptureView: View {
     private func reassignCapture(to rider: Rider) {
         guard let target = overrideTarget, let session else { return }
         let eventId = target.eventId
-        let descriptor = FetchDescriptor<CheckpointEvent>(predicate: #Predicate { $0.id == eventId })
-        guard let event = try? modelContext.fetch(descriptor).first else { return }
+        guard let event = try? modelContext.fetchByID(CheckpointEvent.self, id: eventId) else { return }
 
         let newRun = session.runs.first { $0.rider?.id == rider.id && $0.status == .started }
         event.run = newRun
@@ -168,8 +167,7 @@ struct CheckpointCaptureView: View {
 
     private func markDeleted(_ capture: CaptureRecord) {
         let eventId = capture.eventId
-        let descriptor = FetchDescriptor<CheckpointEvent>(predicate: #Predicate { $0.id == eventId })
-        if let event = try? modelContext.fetch(descriptor).first {
+        if let event = try? modelContext.fetchByID(CheckpointEvent.self, id: eventId) {
             event.deleted = true
         }
         recentCaptures.removeAll { $0.id == capture.id }
@@ -196,12 +194,8 @@ struct CheckpointCaptureView: View {
     // MARK: - Data loading
 
     private func loadData() {
-        let sid = sessionId
-        let cid = checkpointId
-        let sd = FetchDescriptor<Session>(predicate: #Predicate { $0.id == sid })
-        session = try? modelContext.fetch(sd).first
-        let cd = FetchDescriptor<Checkpoint>(predicate: #Predicate { $0.id == cid })
-        checkpoint = try? modelContext.fetch(cd).first
+        session = try? modelContext.fetchByID(Session.self, id: sessionId)
+        checkpoint = try? modelContext.fetchByID(Checkpoint.self, id: checkpointId)
         rebuildExpected()
     }
 

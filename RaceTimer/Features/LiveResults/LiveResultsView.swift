@@ -84,9 +84,7 @@ struct LiveResultsView: View {
     // MARK: - Data
 
     private func loadSession() {
-        let sid = sessionId
-        let descriptor = FetchDescriptor<Session>(predicate: #Predicate { $0.id == sid })
-        session = try? modelContext.fetch(descriptor).first
+        session = try? modelContext.fetchByID(Session.self, id: sessionId)
         refreshResults()
     }
 
@@ -113,8 +111,10 @@ struct LiveResultsView: View {
     }
 
     private func startAutoRefresh() {
-        refreshTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
-            refreshResults()
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { [self] _ in
+            Task { @MainActor in
+                self.refreshResults()
+            }
         }
     }
 
