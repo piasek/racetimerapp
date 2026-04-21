@@ -1,5 +1,5 @@
 import Foundation
-import MultipeerConnectivity
+@preconcurrency import MultipeerConnectivity
 import SwiftData
 import os
 
@@ -10,7 +10,11 @@ final class PeerSyncService: NSObject {
     private static let serviceType = "racetimer-sync" // max 15 chars, lowercase + hyphens
 
     private let peerId: MCPeerID
-    private var session: MCSession?
+    /// Accessed from both @MainActor (start/stop/send) and nonisolated delegate callbacks.
+    /// Excluded from @Observable tracking; nonisolated(unsafe) because MC delegates are
+    /// called on arbitrary threads but we guarantee single-writer (start/stop) on MainActor.
+    @ObservationIgnored
+    nonisolated(unsafe) private var session: MCSession?
     private var advertiser: MCNearbyServiceAdvertiser?
     private var browser: MCNearbyServiceBrowser?
 
@@ -94,9 +98,8 @@ final class PeerSyncService: NSObject {
 
 extension PeerSyncService: MCSessionDelegate {
     nonisolated func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
-        let peers = session.connectedPeers
         Task { @MainActor in
-            connectedPeers = peers
+            connectedPeers = session.connectedPeers
             switch state {
             case .connected:
                 logger.info("Peer connected: \(peerID.displayName)")
@@ -128,10 +131,7 @@ extension PeerSyncService: MCSessionDelegate {
 
 extension PeerSyncService: MCNearbyServiceAdvertiserDelegate {
     nonisolated func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
-        // Auto-accept all invitations from nearby peers
-        Task { @MainActor in
-            invitationHandler(true, session)
-        }
+        invitationHandler(true, session)
     }
 }
 
