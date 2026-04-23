@@ -290,3 +290,105 @@ struct ExportTests {
         #expect(escapeCSV("line\nbreak") == "\"line\nbreak\"")
     }
 }
+
+// MARK: - PeerSyncService reconnection
+
+@MainActor
+struct PeerSyncReconnectTests {
+    // The pure decision function — exhaustive truth table.
+
+    @Test func neverRestartsBeforeStart() {
+        // hasStartParams=false: any path change must not trigger restart.
+        #expect(PeerSyncService.shouldRestart(satisfied: true,  lastSatisfied: false, hasStartParams: false) == false)
+        #expect(PeerSyncService.shouldRestart(satisfied: true,  lastSatisfied: true,  hasStartParams: false) == false)
+        #expect(PeerSyncService.shouldRestart(satisfied: false, lastSatisfied: true,  hasStartParams: false) == false)
+        #expect(PeerSyncService.shouldRestart(satisfied: false, lastSatisfied: false, hasStartParams: false) == false)
+    }
+
+    @Test func restartsOnlyOnRecoveryEdge() {
+        // Edge unsatisfied -> satisfied: restart.
+        #expect(PeerSyncService.shouldRestart(satisfied: true,  lastSatisfied: false, hasStartParams: true) == true)
+        // Steady satisfied: no restart.
+        #expect(PeerSyncService.shouldRestart(satisfied: true,  lastSatisfied: true,  hasStartParams: true) == false)
+        // Drop edge satisfied -> unsatisfied: no restart (we wait for recovery).
+        #expect(PeerSyncService.shouldRestart(satisfied: false, lastSatisfied: true,  hasStartParams: true) == false)
+        // Steady unsatisfied: no restart.
+        #expect(PeerSyncService.shouldRestart(satisfied: false, lastSatisfied: false, hasStartParams: true) == false)
+    }
+
+    // End-to-end path-change scenario via the test hook.
+
+    @Test func wifiDropAndRecoveryTriggersExactlyOneRestart() {
+        let svc = PeerSyncService()
+        svc.start(deviceId: "dev-1", role: "observer")
+        #expect(svc.isActive)
+        #expect(svc.restartCount == 0)
+
+        // Simulate: airplane mode on (path becomes unsatisfied).
+        svc.simulatePathChange(satisfied: false)
+        #expect(svc.restartCount == 0, "Drop alone must not restart")
+
+        // Simulate: airplane mode off / Wi-Fi back (path becomes satisfied again).
+        svc.simulatePathChange(satisfied: true)
+        #expect(svc.restartCount == 1, "Recovery edge must restart exactly once")
+        #expect(svc.isActive, "Stack must be active after restart")
+
+        svc.stop()
+    }
+
+    @Test func steadyPathDoesNotRestart() {
+        let svc = PeerSyncService()
+        svc.start(deviceId: "dev-1", role: "observer")
+
+        // Multiple "still satisfied" updates must not trigger restarts.
+        svc.simulatePathChange(satisfied: true)
+        svc.simulatePathChange(satisfied: true)
+        svc.simulatePathChange(satisfied: true)
+        #expect(svc.restartCount == 0)
+
+        svc.stop()
+    }
+
+    @Test func pathRecoveryBeforeStartIsIgnored() {
+        let svc = PeerSyncService()
+        // No start() called yet — path edges should not bring up the stack.
+        svc.simulatePathChange(satisfied: false)
+        svc.simulatePathChange(satisfied: true)
+        #expect(svc.restartCount == 0)
+        #expect(svc.isActive == false)
+    }
+
+    @Test func stopThenPathRecoveryDoesNotRestart() {
+        let svc = PeerSyncService()
+        svc.start(deviceId: "dev-1", role: "observer")
+        svc.stop()
+        // A late path edge after stop must not silently bring sync back up.
+        svc.simulatePathChange(satisfied: false)
+        svc.simulatePathChange(satisfied: true)
+        #expect(svc.restartCount == 0)
+        #expect(svc.isActive == false)
+    }
+
+    @Test func restartPreservesStartParams() {
+        let svc = PeerSyncService()
+        svc.start(deviceId: "dev-1", role: "start", sessionId: "s-42")
+        #expect(svc.isActive)
+
+        svc.restart()
+        #expect(svc.restartCount == 1)
+        // After an explicit restart, the stack is still active and a subsequent
+        // recovery edge would restart again — params were retained.
+        svc.simulatePathChange(satisfied: false)
+        svc.simulatePathChange(satisfied: true)
+        #expect(svc.restartCount == 2)
+
+        svc.stop()
+    }
+
+    @Test func restartIsNoOpWhenNeverStarted() {
+        let svc = PeerSyncService()
+        svc.restart()
+        #expect(svc.restartCount == 0)
+        #expect(svc.isActive == false)
+    }
+}

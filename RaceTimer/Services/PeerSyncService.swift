@@ -72,13 +72,22 @@ final class PeerSyncService: NSObject {
         logger.info("Peer sync stopped")
     }
 
+    /// Number of times `restart()` has run. Exposed for tests; not for UI.
+    private(set) var restartCount: Int = 0
+
     /// Full restart of the MC stack while preserving last start params. Used on
     /// network-path recovery; safe to call even if the stack isn't running.
     func restart() {
         guard let params = lastStartParams else { return }
+        restartCount += 1
         logger.info("Restarting peer sync stack")
         tearDownStack()
         bringUpStack(deviceId: params.deviceId, role: params.role, sessionId: params.sessionId)
+    }
+
+    /// Test hook: drive the network-path state machine without a real NWPathMonitor.
+    func simulatePathChange(satisfied: Bool) {
+        handlePathChange(satisfied: satisfied)
     }
 
     private func bringUpStack(deviceId: String, role: String, sessionId: String?) {
@@ -143,15 +152,26 @@ final class PeerSyncService: NSObject {
     }
 
     private func handlePathChange(satisfied: Bool) {
+        let shouldRestart = Self.shouldRestart(
+            satisfied: satisfied,
+            lastSatisfied: lastPathSatisfied,
+            hasStartParams: lastStartParams != nil
+        )
         defer { lastPathSatisfied = satisfied }
-        guard lastStartParams != nil else { return }
-        if satisfied && !lastPathSatisfied {
-            // Edge: network came back. Rebuild MC stack so advertising/browsing resume.
+        if shouldRestart {
             logger.info("Network path satisfied — restarting peer sync")
             restart()
         } else if !satisfied && lastPathSatisfied {
             logger.info("Network path lost — MC will be rebuilt when it returns")
         }
+    }
+
+    /// Pure decision function: should we kick the MC stack on this path edge?
+    /// Restart only on a `.unsatisfied` -> `.satisfied` edge while sync was
+    /// requested (i.e. `start` was called and `stop` hasn't been). Exposed
+    /// internal so reconnection logic is unit-testable without a real network.
+    static func shouldRestart(satisfied: Bool, lastSatisfied: Bool, hasStartParams: Bool) -> Bool {
+        hasStartParams && satisfied && !lastSatisfied
     }
 
     private func refreshDiscoveredPeers() {
