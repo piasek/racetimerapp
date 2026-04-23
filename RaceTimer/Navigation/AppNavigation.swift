@@ -44,6 +44,7 @@ struct AppNavigation: View {
                     }
                 }
         }
+        .syncStatusBar()
         .onAppear(perform: startSyncIfPossible)
         .onChange(of: roleCoordinator.activeSessionId) { _, _ in startSyncIfPossible() }
         .onChange(of: roleCoordinator.currentRole) { _, _ in startSyncIfPossible() }

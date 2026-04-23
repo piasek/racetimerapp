@@ -137,7 +137,7 @@ struct SyncStatusBar: View {
                 summary.color.opacity(0.10)
                     .background(.ultraThinMaterial)
             }
-            .overlay(alignment: .bottom) {
+            .overlay(alignment: .top) {
                 Divider()
             }
         }
@@ -174,11 +174,11 @@ struct SyncStatusBar: View {
 }
 
 extension View {
-    /// Pin a persistent sync status strip above content using a safe-area
-    /// inset. Apply to a non-NavigationStack root (e.g. wrap content in a
-    /// container view) so the strip lands above the nav bar, not inside it.
+    /// Pin a persistent sync status strip below content via a bottom
+    /// safe-area inset (Mail / Music style). Apply once at the
+    /// NavigationStack root so it appears on every screen.
     func syncStatusBar() -> some View {
-        safeAreaInset(edge: .top, spacing: 0) {
+        safeAreaInset(edge: .bottom, spacing: 0) {
             SyncStatusBar()
         }
     }
