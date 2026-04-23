@@ -16,6 +16,7 @@ struct AppNavigation: View {
     @State private var path = NavigationPath()
     @Environment(RoleCoordinator.self) private var roleCoordinator
     @Environment(SyncCoordinator.self) private var syncCoordinator
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -46,6 +47,13 @@ struct AppNavigation: View {
         .onAppear(perform: startSyncIfPossible)
         .onChange(of: roleCoordinator.activeSessionId) { _, _ in startSyncIfPossible() }
         .onChange(of: roleCoordinator.currentRole) { _, _ in startSyncIfPossible() }
+        .onChange(of: scenePhase) { _, phase in
+            // Safety net: when returning to foreground, kick the MC stack so we
+            // recover from any network transitions that happened while backgrounded.
+            if phase == .active, syncCoordinator.isStarted {
+                syncCoordinator.peerSync.restart()
+            }
+        }
     }
 
     /// Start the MC transport as soon as the app is up so users can see

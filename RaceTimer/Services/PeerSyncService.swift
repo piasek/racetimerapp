@@ -1,5 +1,6 @@
 import Foundation
 @preconcurrency import MultipeerConnectivity
+import Network
 import SwiftData
 import os
 
@@ -38,6 +39,17 @@ final class PeerSyncService: NSObject {
 
     private let logger = Logger(subsystem: "com.racetimerapp", category: "PeerSync")
 
+    // MARK: - Network path monitoring
+    //
+    // When Wi-Fi drops (airplane mode, network switch, AP reconnect) MC
+    // advertising/browsing silently dies. MC does not recover on its own —
+    // the advertiser/browser/session must be torn down and recreated. We
+    // watch NWPathMonitor and restart the stack on every satisfied edge.
+    @ObservationIgnored private var pathMonitor: NWPathMonitor?
+    @ObservationIgnored private var lastPathSatisfied: Bool = true
+    /// Remember last start params so we can restart transparently on network recovery.
+    @ObservationIgnored private var lastStartParams: (deviceId: String, role: String, sessionId: String?)?
+
     override init() {
         self.peerId = MCPeerID(displayName: UIDevice.current.name)
         super.init()
@@ -46,8 +58,30 @@ final class PeerSyncService: NSObject {
     // MARK: - Start / Stop
 
     func start(deviceId: String, role: String, sessionId: String? = nil) {
-        guard !isActive else { return }
+        lastStartParams = (deviceId, role, sessionId)
+        if !isActive {
+            bringUpStack(deviceId: deviceId, role: role, sessionId: sessionId)
+        }
+        startPathMonitorIfNeeded()
+    }
 
+    func stop() {
+        tearDownStack()
+        stopPathMonitor()
+        lastStartParams = nil
+        logger.info("Peer sync stopped")
+    }
+
+    /// Full restart of the MC stack while preserving last start params. Used on
+    /// network-path recovery; safe to call even if the stack isn't running.
+    func restart() {
+        guard let params = lastStartParams else { return }
+        logger.info("Restarting peer sync stack")
+        tearDownStack()
+        bringUpStack(deviceId: params.deviceId, role: params.role, sessionId: params.sessionId)
+    }
+
+    private func bringUpStack(deviceId: String, role: String, sessionId: String?) {
         let session = MCSession(peer: peerId, securityIdentity: nil, encryptionPreference: .required)
         session.delegate = self
         self.session = session
@@ -73,7 +107,7 @@ final class PeerSyncService: NSObject {
         logger.info("Peer sync started as \(self.peerId.displayName)")
     }
 
-    func stop() {
+    private func tearDownStack() {
         advertiser?.stopAdvertisingPeer()
         browser?.stopBrowsingForPeers()
         session?.disconnect()
@@ -85,7 +119,39 @@ final class PeerSyncService: NSObject {
         peerInfo.removeAll()
         peerStates.removeAll()
         isActive = false
-        logger.info("Peer sync stopped")
+    }
+
+    // MARK: - Network path monitoring
+
+    private func startPathMonitorIfNeeded() {
+        guard pathMonitor == nil else { return }
+        let monitor = NWPathMonitor()
+        monitor.pathUpdateHandler = { [weak self] path in
+            let satisfied = path.status == .satisfied
+            Task { @MainActor in
+                self?.handlePathChange(satisfied: satisfied)
+            }
+        }
+        monitor.start(queue: DispatchQueue(label: "com.racetimerapp.PeerSync.path"))
+        pathMonitor = monitor
+        lastPathSatisfied = true // will be corrected on first update
+    }
+
+    private func stopPathMonitor() {
+        pathMonitor?.cancel()
+        pathMonitor = nil
+    }
+
+    private func handlePathChange(satisfied: Bool) {
+        defer { lastPathSatisfied = satisfied }
+        guard lastStartParams != nil else { return }
+        if satisfied && !lastPathSatisfied {
+            // Edge: network came back. Rebuild MC stack so advertising/browsing resume.
+            logger.info("Network path satisfied — restarting peer sync")
+            restart()
+        } else if !satisfied && lastPathSatisfied {
+            logger.info("Network path lost — MC will be rebuilt when it returns")
+        }
     }
 
     private func refreshDiscoveredPeers() {
@@ -172,6 +238,12 @@ extension PeerSyncService: MCNearbyServiceAdvertiserDelegate {
     nonisolated func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         invitationHandler(true, session)
     }
+
+    nonisolated func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
+        Task { @MainActor in
+            logger.error("Advertiser failed to start: \(error.localizedDescription). Will retry on network recovery.")
+        }
+    }
 }
 
 // MARK: - MCNearbyServiceBrowserDelegate
@@ -197,6 +269,12 @@ extension PeerSyncService: MCNearbyServiceBrowserDelegate {
                 peerStates.removeValue(forKey: peerID)
             }
             refreshDiscoveredPeers()
+        }
+    }
+
+    nonisolated func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
+        Task { @MainActor in
+            logger.error("Browser failed to start: \(error.localizedDescription). Will retry on network recovery.")
         }
     }
 }
