@@ -174,8 +174,9 @@ struct SyncStatusBar: View {
 }
 
 extension View {
-    /// Pin a persistent sync status strip above content. Apply once at the
-    /// NavigationStack root so it appears on every screen.
+    /// Pin a persistent sync status strip above content using a safe-area
+    /// inset. Apply to a non-NavigationStack root (e.g. wrap content in a
+    /// container view) so the strip lands above the nav bar, not inside it.
     func syncStatusBar() -> some View {
         safeAreaInset(edge: .top, spacing: 0) {
             SyncStatusBar()

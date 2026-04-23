@@ -37,9 +37,12 @@ struct RaceTimerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AppNavigation()
-                .environment(roleCoordinator)
-                .environment(syncCoordinator)
+            VStack(spacing: 0) {
+                SyncStatusBar()
+                AppNavigation()
+            }
+            .environment(roleCoordinator)
+            .environment(syncCoordinator)
         }
         .modelContainer(modelContainer)
     }
