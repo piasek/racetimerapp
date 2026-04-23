@@ -25,6 +25,11 @@ targets:
         NSBonjourServices:
           - _racetimer-sync._tcp
           - _racetimer-sync._udp
+        UILaunchScreen: {}
+        UIApplicationSupportsIndirectInputEvents: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        CFBundleDisplayName: RaceTimer
     settings:
       base:
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
