@@ -97,7 +97,7 @@ struct ExtendedProjectionTests {
         let events = [
             SyncEvent(deviceId: "a", lamportClock: 1,
                 payload: .sessionUpserted(SessionPayload(
-                    sessionId: sessionId, name: "Race 1", date: .now, courseName: "", notes: ""
+                    sessionId: sessionId, name: "Race 1", date: .now, notes: ""
                 ))),
             SyncEvent(deviceId: "a", lamportClock: 2,
                 payload: .checkpointUpserted(CheckpointPayload(
@@ -130,7 +130,7 @@ struct ExtendedProjectionTests {
         let events = [
             SyncEvent(deviceId: "a", lamportClock: 1,
                 payload: .sessionUpserted(SessionPayload(
-                    sessionId: sessionId, name: "S", date: .now, courseName: "", notes: ""
+                    sessionId: sessionId, name: "S", date: .now, notes: ""
                 ))),
             SyncEvent(deviceId: "a", lamportClock: 2,
                 payload: .riderUpserted(RiderPayload(
@@ -162,7 +162,7 @@ struct ExtendedProjectionTests {
                 ))),
             SyncEvent(deviceId: "a", lamportClock: 1,
                 payload: .sessionUpserted(SessionPayload(
-                    sessionId: sessionId, name: "S", date: .now, courseName: "", notes: ""
+                    sessionId: sessionId, name: "S", date: .now, notes: ""
                 ))),
         ]
         events.forEach { context.insert($0) }
@@ -182,7 +182,7 @@ struct SyncCoordinatorTests {
 
         let sessionId = UUID()
         coord.apply(.sessionUpserted(SessionPayload(
-            sessionId: sessionId, name: "Race", date: .now, courseName: "", notes: ""
+            sessionId: sessionId, name: "Race", date: .now, notes: ""
         )))
 
         let context = container.mainContext
@@ -203,7 +203,7 @@ struct SyncCoordinatorTests {
         let cpId = UUID()
         coord.apply([
             .sessionUpserted(SessionPayload(
-                sessionId: sessionId, name: "S", date: .now, courseName: "", notes: ""
+                sessionId: sessionId, name: "S", date: .now, notes: ""
             )),
             .checkpointUpserted(CheckpointPayload(
                 checkpointId: cpId, sessionId: sessionId, indexInCourse: 0, name: "Start"
@@ -229,7 +229,7 @@ struct SyncCoordinatorTests {
 
         let coord = SyncCoordinator(modelContext: context, deviceId: "dev-1")
         let transfer = coord.apply(.sessionUpserted(SessionPayload(
-            sessionId: UUID(), name: "X", date: .now, courseName: "", notes: ""
+            sessionId: UUID(), name: "X", date: .now, notes: ""
         )))
 
         #expect(transfer?.lamportClock == 44)

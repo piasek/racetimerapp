@@ -26,6 +26,14 @@ struct SessionSetupView: View {
                 } label: {
                     SessionRow(session: session)
                 }
+                .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                    Button {
+                        cloneSession(session)
+                    } label: {
+                        Label("Duplicate", systemImage: "plus.square.on.square")
+                    }
+                    .tint(.blue)
+                }
             }
             .onDelete(perform: deleteSessions)
         }
@@ -60,7 +68,6 @@ struct SessionSetupView: View {
                 sessionId: sessionId,
                 name: name,
                 date: .now,
-                courseName: "",
                 notes: ""
             )),
             .checkpointUpserted(CheckpointPayload(
@@ -86,6 +93,41 @@ struct SessionSetupView: View {
             syncCoordinator.apply(.sessionDeleted(EntityIdPayload(id: sessions[index].id)))
         }
     }
+
+    /// Duplicate an existing session: same name (with " (copy)" suffix), today's
+    /// date, copied checkpoints and riders. Runs and checkpoint events are not
+    /// copied — the new session starts with no timing data.
+    private func cloneSession(_ source: Session) {
+        let newSessionId = UUID()
+        var payloads: [SyncPayload] = [
+            .sessionUpserted(SessionPayload(
+                sessionId: newSessionId,
+                name: "\(source.name) (copy)",
+                date: .now,
+                notes: source.notes
+            )),
+        ]
+        for cp in source.sortedCheckpoints {
+            payloads.append(.checkpointUpserted(CheckpointPayload(
+                checkpointId: UUID(),
+                sessionId: newSessionId,
+                indexInCourse: cp.indexInCourse,
+                name: cp.name
+            )))
+        }
+        for rider in source.riders {
+            payloads.append(.riderUpserted(RiderPayload(
+                riderId: UUID(),
+                sessionId: newSessionId,
+                firstName: rider.firstName,
+                lastName: rider.lastName,
+                bibNumber: rider.bibNumber,
+                category: rider.category,
+                notes: rider.notes
+            )))
+        }
+        syncCoordinator.apply(payloads)
+    }
 }
 
 private struct SessionRow: View {
@@ -95,6 +137,11 @@ private struct SessionRow: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(session.name)
                 .font(.headline)
+            if let dateText {
+                Text(dateText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             HStack(spacing: 12) {
                 Label("\(session.riders.count)", systemImage: "person.2")
                 Label("\(session.checkpoints.count) cp", systemImage: "mappin")
@@ -104,5 +151,12 @@ private struct SessionRow: View {
             .foregroundStyle(.secondary)
         }
         .padding(.vertical, 2)
+    }
+
+    /// Hide the date if the session is in the future and hasn't occurred yet.
+    private var dateText: String? {
+        let now = Date()
+        guard session.date <= now else { return nil }
+        return session.date.formatted(.dateTime.weekday().month().day().year())
     }
 }

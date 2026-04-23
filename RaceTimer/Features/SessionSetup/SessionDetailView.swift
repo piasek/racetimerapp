@@ -20,9 +20,7 @@ struct SessionDetailView: View {
     @State private var riderCategory = ""
 
     // Session edit
-    @State private var editingName = false
     @State private var editedName = ""
-    @State private var editedCourseName = ""
     @State private var editedNotes = ""
 
     var body: some View {
@@ -41,15 +39,14 @@ struct SessionDetailView: View {
         List {
             // MARK: - Info section
             Section("Session Info") {
-                LabeledContent("Name", value: session.name)
-                TextField("Course name", text: $editedCourseName)
-                    .onChange(of: editedCourseName) { _, newValue in
-                        broadcastSessionEdits(session, courseName: newValue, notes: editedNotes)
+                TextField("Name", text: $editedName)
+                    .onChange(of: editedName) { _, newValue in
+                        broadcastSessionEdits(session, name: newValue, notes: editedNotes)
                     }
                 TextField("Notes", text: $editedNotes, axis: .vertical)
                     .lineLimit(2...4)
                     .onChange(of: editedNotes) { _, newValue in
-                        broadcastSessionEdits(session, courseName: editedCourseName, notes: newValue)
+                        broadcastSessionEdits(session, name: editedName, notes: newValue)
                     }
             }
 
@@ -128,12 +125,14 @@ struct SessionDetailView: View {
         }
     }
 
-    private func broadcastSessionEdits(_ session: Session, courseName: String, notes: String) {
+    private func broadcastSessionEdits(_ session: Session, name: String, notes: String) {
+        let trimmedName = name.trimmingCharacters(in: .whitespaces)
+        // Ignore empty-name edits — keep last valid value.
+        let resolvedName = trimmedName.isEmpty ? session.name : trimmedName
         syncCoordinator.apply(.sessionUpserted(SessionPayload(
             sessionId: session.id,
-            name: session.name,
+            name: resolvedName,
             date: session.date,
-            courseName: courseName,
             notes: notes
         )))
     }
@@ -259,7 +258,7 @@ struct SessionDetailView: View {
     private func loadSession() {
         session = try? modelContext.fetchByID(Session.self, id: sessionId)
         if let session {
-            editedCourseName = session.courseName
+            editedName = session.name
             editedNotes = session.notes
         }
     }

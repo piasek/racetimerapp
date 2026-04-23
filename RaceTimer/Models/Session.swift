@@ -6,7 +6,6 @@ final class Session {
     @Attribute(.unique) var id: UUID
     var name: String
     var date: Date
-    var courseName: String
     var notes: String
 
     @Relationship(deleteRule: .cascade, inverse: \Checkpoint.session)
@@ -22,13 +21,11 @@ final class Session {
         id: UUID = UUID(),
         name: String,
         date: Date = .now,
-        courseName: String = "",
         notes: String = ""
     ) {
         self.id = id
         self.name = name
         self.date = date
-        self.courseName = courseName
         self.notes = notes
         self.checkpoints = []
         self.riders = []

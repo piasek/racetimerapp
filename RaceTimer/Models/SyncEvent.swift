@@ -71,7 +71,6 @@ struct SessionPayload: Codable, Sendable {
     var sessionId: UUID
     var name: String
     var date: Date
-    var courseName: String
     var notes: String
 }
 

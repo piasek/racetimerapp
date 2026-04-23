@@ -17,9 +17,11 @@ struct RoleSelectionView: View {
             Section {
                 Text(session?.name ?? "Session")
                     .font(.headline)
-                Text(session?.courseName ?? "")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                if let date = session?.date {
+                    Text(date, format: .dateTime.weekday().month().day().year())
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Section("Race Officials") {

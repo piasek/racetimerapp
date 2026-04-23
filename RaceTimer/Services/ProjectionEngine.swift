@@ -51,14 +51,12 @@ struct ProjectionEngine {
         if let existing = try fetchSession(id: p.sessionId, in: context) {
             existing.name = p.name
             existing.date = p.date
-            existing.courseName = p.courseName
             existing.notes = p.notes
         } else {
             let session = Session(
                 id: p.sessionId,
                 name: p.name,
                 date: p.date,
-                courseName: p.courseName,
                 notes: p.notes
             )
             context.insert(session)
