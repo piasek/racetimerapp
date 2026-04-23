@@ -7,6 +7,7 @@ struct CheckpointCaptureView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(RoleCoordinator.self) private var roleCoordinator
+    @Environment(SyncCoordinator.self) private var syncCoordinator
 
     @State private var session: Session?
     @State private var checkpoint: Checkpoint?
@@ -91,20 +92,21 @@ struct CheckpointCaptureView: View {
         let expectedRider = expectedRiders.first
         let run = findOrCreateRun(for: expectedRider, in: session)
 
-        let event = CheckpointEvent(
+        let eventId = UUID()
+        syncCoordinator.apply(.checkpointEventRecorded(CheckpointEventPayload(
+            eventId: eventId,
+            runId: run?.id,
+            checkpointId: checkpoint.id,
             timestamp: timestamp,
             recordedByDeviceId: roleCoordinator.deviceId,
             autoAssignedRiderId: expectedRider?.id
-        )
-        event.run = run
-        event.checkpoint = checkpoint
-        modelContext.insert(event)
+        )))
 
         let record = CaptureRecord(
-            id: event.id,
+            id: eventId,
             riderName: expectedRider?.displayName ?? "Unknown",
             timestamp: timestamp,
-            eventId: event.id
+            eventId: eventId
         )
         recentCaptures.insert(record, at: 0)
         rebuildExpected()
@@ -147,12 +149,16 @@ struct CheckpointCaptureView: View {
 
     private func reassignCapture(to rider: Rider) {
         guard let target = overrideTarget, let session else { return }
-        let eventId = target.eventId
-        guard let event = try? modelContext.fetchByID(CheckpointEvent.self, id: eventId) else { return }
-
         let newRun = session.runs.first { $0.rider?.id == rider.id && $0.status == .started }
-        event.run = newRun
-        event.manualOverride = true
+
+        syncCoordinator.apply(.checkpointEventEdited(CheckpointEventEditPayload(
+            eventId: target.eventId,
+            reassignedRunId: newRun?.id,
+            deleted: nil,
+            ignored: nil,
+            manualOverride: true,
+            note: nil
+        )))
 
         if let idx = recentCaptures.firstIndex(where: { $0.id == target.id }) {
             recentCaptures[idx] = CaptureRecord(
@@ -166,10 +172,14 @@ struct CheckpointCaptureView: View {
     }
 
     private func markDeleted(_ capture: CaptureRecord) {
-        let eventId = capture.eventId
-        if let event = try? modelContext.fetchByID(CheckpointEvent.self, id: eventId) {
-            event.deleted = true
-        }
+        syncCoordinator.apply(.checkpointEventEdited(CheckpointEventEditPayload(
+            eventId: capture.eventId,
+            reassignedRunId: nil,
+            deleted: true,
+            ignored: nil,
+            manualOverride: nil,
+            note: nil
+        )))
         recentCaptures.removeAll { $0.id == capture.id }
         rebuildExpected()
     }

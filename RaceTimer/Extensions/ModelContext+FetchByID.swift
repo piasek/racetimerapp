@@ -6,8 +6,7 @@ extension ModelContext {
     /// Works around Swift 6 #Predicate KeyPath Sendable issues with SwiftData.
     func fetchByID<T: PersistentModel>(_ type: T.Type, id: UUID) throws -> T?
     where T: Identifiable, T.ID == UUID {
-        var descriptor = FetchDescriptor<T>()
-        descriptor.fetchLimit = 1
+        let descriptor = FetchDescriptor<T>()
         return try fetch(descriptor).first { $0.id == id }
     }
 }

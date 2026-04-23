@@ -1,7 +1,11 @@
 import Foundation
 import SwiftData
 
-/// Wraps SwiftData ModelContext for session CRUD and derived results.
+/// Read-only helpers over SwiftData for derived race results.
+///
+/// All domain **mutations** go through `SyncCoordinator.apply(_:)` so that
+/// every change is appended to the event log and broadcast to peers.
+/// This type intentionally exposes no mutating operations.
 @MainActor
 final class SessionStore: ObservableObject {
     let modelContainer: ModelContainer
@@ -12,79 +16,9 @@ final class SessionStore: ObservableObject {
         self.modelContext = modelContainer.mainContext
     }
 
-    // MARK: - Session CRUD
-
-    func createSession(name: String, courseName: String = "", notes: String = "") -> Session {
-        let session = Session(name: name, courseName: courseName, notes: notes)
-        modelContext.insert(session)
-        return session
-    }
-
     func fetchSessions() throws -> [Session] {
         let descriptor = FetchDescriptor<Session>()
         return try modelContext.fetch(descriptor).sorted { $0.date > $1.date }
-    }
-
-    func deleteSession(_ session: Session) {
-        modelContext.delete(session)
-    }
-
-    // MARK: - Checkpoint management
-
-    func addCheckpoint(to session: Session, name: String) -> Checkpoint {
-        let nextIndex = session.checkpoints.count
-        let checkpoint = Checkpoint(indexInCourse: nextIndex, name: name)
-        checkpoint.session = session
-        modelContext.insert(checkpoint)
-        return checkpoint
-    }
-
-    // MARK: - Rider management
-
-    func addRider(
-        to session: Session,
-        firstName: String,
-        lastName: String? = nil,
-        bibNumber: Int? = nil,
-        category: String? = nil
-    ) -> Rider {
-        let rider = Rider(
-            firstName: firstName,
-            lastName: lastName,
-            bibNumber: bibNumber,
-            category: category
-        )
-        rider.session = session
-        modelContext.insert(rider)
-        return rider
-    }
-
-    // MARK: - Run management
-
-    func createRun(in session: Session, for rider: Rider) -> Run {
-        let run = Run(status: .scheduled)
-        run.rider = rider
-        run.session = session
-        modelContext.insert(run)
-        return run
-    }
-
-    func recordCheckpointEvent(
-        for run: Run,
-        at checkpoint: Checkpoint,
-        timestamp: Date = .now,
-        recordedByDeviceId: String,
-        autoAssignedRiderId: UUID? = nil
-    ) -> CheckpointEvent {
-        let event = CheckpointEvent(
-            timestamp: timestamp,
-            recordedByDeviceId: recordedByDeviceId,
-            autoAssignedRiderId: autoAssignedRiderId
-        )
-        event.run = run
-        event.checkpoint = checkpoint
-        modelContext.insert(event)
-        return event
     }
 
     // MARK: - Derived results
@@ -111,10 +45,6 @@ final class SessionStore: ObservableObject {
                 case (nil, nil): return lhs.riderName < rhs.riderName
                 }
             }
-    }
-
-    func save() throws {
-        try modelContext.save()
     }
 }
 

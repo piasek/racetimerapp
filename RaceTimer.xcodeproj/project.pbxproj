@@ -11,6 +11,7 @@
 		04E07A23B2B5CF116C1270D8 /* ServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678F5637A2A4CCB7A721F28C /* ServiceTests.swift */; };
 		2B927234810E60C1D4886597 /* SessionSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AF740B1C5E85DE87555C47 /* SessionSetupView.swift */; };
 		2C9810E4AD37E587F5460BCB /* RaceTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BC2CAEC615E0CA225879BB1 /* RaceTimerTests.swift */; };
+		2CFA42F971C646B5A624683E /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1BC485C3DA4B0AD97A1D4A /* SyncCoordinator.swift */; };
 		30E8798A4DBF6C3C6546BB8D /* RaceTimerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3F65EBD3C88FD95FFB5DD4 /* RaceTimerApp.swift */; };
 		30FB443905C0EEDA81C37336 /* StartLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB545205B6C6FBB332F7BBA7 /* StartLineView.swift */; };
 		3463A1D940C11D176ABA7ED0 /* ClockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8D13599E8CB70A79E14B83 /* ClockService.swift */; };
@@ -57,6 +58,7 @@
 		22D6964744270E4F55C88B27 /* CheckpointCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckpointCaptureView.swift; sourceTree = "<group>"; };
 		34B57679718CE39083DDF759 /* ReviewAndCorrectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewAndCorrectView.swift; sourceTree = "<group>"; };
 		3C3F65EBD3C88FD95FFB5DD4 /* RaceTimerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaceTimerApp.swift; sourceTree = "<group>"; };
+		3F1BC485C3DA4B0AD97A1D4A /* SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
 		41155EBC724D451E7AB71DB3 /* SessionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailView.swift; sourceTree = "<group>"; };
 		48FCA7158FFCA725BEF056AD /* CheckpointEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckpointEvent.swift; sourceTree = "<group>"; };
 		57184745183BD20F7A030540 /* Checkpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checkpoint.swift; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 		B6AF740B1C5E85DE87555C47 /* SessionSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSetupView.swift; sourceTree = "<group>"; };
 		B7BCB92E91E4C18FDE72574A /* RoleCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoleCoordinator.swift; sourceTree = "<group>"; };
 		BC8D13599E8CB70A79E14B83 /* ClockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockService.swift; sourceTree = "<group>"; };
+		C4DFA58A64AF2AC7C146AC80 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C75FD7D4B915630D4D6E46E7 /* RaceTimerTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RaceTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFBC572EFA80506A03491841 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		CFE6C383C83E043F6BB52BC5 /* PeerSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerSyncService.swift; sourceTree = "<group>"; };
@@ -163,6 +166,7 @@
 				FC113525837751982C062FE7 /* ProjectionEngine.swift */,
 				B7BCB92E91E4C18FDE72574A /* RoleCoordinator.swift */,
 				5C4798E2C7B2AF32419F529B /* SessionStore.swift */,
+				3F1BC485C3DA4B0AD97A1D4A /* SyncCoordinator.swift */,
 				61F9D342C2A51F78E78CFA42 /* SyncEngine.swift */,
 			);
 			path = Services;
@@ -204,6 +208,7 @@
 		C86A83933247183D0542CA8D /* RaceTimer */ = {
 			isa = PBXGroup;
 			children = (
+				C4DFA58A64AF2AC7C146AC80 /* Info.plist */,
 				A60EC02863887ABB50E5F0F7 /* App */,
 				4C6D3CC41AE534BF59F8292A /* Components */,
 				19A03EAA8928AB53EF163062 /* Extensions */,
@@ -312,6 +317,7 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					14237D3F7B7B1EC60BB1B949 = {
+						DevelopmentTeam = RL25SWA85T;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -375,6 +381,7 @@
 				96D53189969BC423207B67AB /* SessionStore.swift in Sources */,
 				B5E3AEB8E293505A938246A1 /* SharedComponents.swift in Sources */,
 				30FB443905C0EEDA81C37336 /* StartLineView.swift in Sources */,
+				2CFA42F971C646B5A624683E /* SyncCoordinator.swift in Sources */,
 				C24C54102161590E9C529D91 /* SyncEngine.swift in Sources */,
 				878C3B4F19F896DA904B73F9 /* SyncEvent.swift in Sources */,
 			);
@@ -454,7 +461,9 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
+				DEVELOPMENT_TEAM = RL25SWA85T;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = RaceTimer/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RaceTimer;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -542,7 +551,9 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
+				DEVELOPMENT_TEAM = RL25SWA85T;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = RaceTimer/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RaceTimer;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

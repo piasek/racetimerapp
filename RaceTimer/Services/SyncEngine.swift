@@ -65,7 +65,7 @@ final class SyncEngine {
                 deviceId: transfer.deviceId,
                 lamportClock: transfer.lamportClock,
                 wallClockTimestamp: transfer.wallClockTimestamp,
-                payload: .riderUpserted(RiderPayload(riderId: UUID(), firstName: "")) // placeholder
+                payload: .sessionDeleted(EntityIdPayload(id: UUID())) // placeholder, overwritten below
             )
             // Overwrite with actual payload data
             event.payloadType = transfer.payloadType

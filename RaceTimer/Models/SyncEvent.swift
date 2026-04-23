@@ -34,16 +34,28 @@ final class SyncEvent {
 // MARK: - Sync payloads
 
 enum SyncPayload: Codable, Sendable {
+    case sessionUpserted(SessionPayload)
+    case sessionDeleted(EntityIdPayload)
+    case checkpointUpserted(CheckpointPayload)
+    case checkpointDeleted(EntityIdPayload)
     case riderUpserted(RiderPayload)
+    case riderDeleted(EntityIdPayload)
     case runCreated(RunPayload)
+    case runDeleted(EntityIdPayload)
     case checkpointEventRecorded(CheckpointEventPayload)
     case checkpointEventEdited(CheckpointEventEditPayload)
     case runStatusChanged(RunStatusPayload)
 
     var payloadType: String {
         switch self {
+        case .sessionUpserted: "sessionUpserted"
+        case .sessionDeleted: "sessionDeleted"
+        case .checkpointUpserted: "checkpointUpserted"
+        case .checkpointDeleted: "checkpointDeleted"
         case .riderUpserted: "riderUpserted"
+        case .riderDeleted: "riderDeleted"
         case .runCreated: "runCreated"
+        case .runDeleted: "runDeleted"
         case .checkpointEventRecorded: "checkpointEventRecorded"
         case .checkpointEventEdited: "checkpointEventEdited"
         case .runStatusChanged: "runStatusChanged"
@@ -51,8 +63,28 @@ enum SyncPayload: Codable, Sendable {
     }
 }
 
+struct EntityIdPayload: Codable, Sendable {
+    var id: UUID
+}
+
+struct SessionPayload: Codable, Sendable {
+    var sessionId: UUID
+    var name: String
+    var date: Date
+    var courseName: String
+    var notes: String
+}
+
+struct CheckpointPayload: Codable, Sendable {
+    var checkpointId: UUID
+    var sessionId: UUID
+    var indexInCourse: Int
+    var name: String
+}
+
 struct RiderPayload: Codable, Sendable {
     var riderId: UUID
+    var sessionId: UUID
     var firstName: String
     var lastName: String?
     var bibNumber: Int?
@@ -62,13 +94,14 @@ struct RiderPayload: Codable, Sendable {
 
 struct RunPayload: Codable, Sendable {
     var runId: UUID
+    var sessionId: UUID
     var riderId: UUID
     var status: String
 }
 
 struct CheckpointEventPayload: Codable, Sendable {
     var eventId: UUID
-    var runId: UUID
+    var runId: UUID?
     var checkpointId: UUID
     var timestamp: Date
     var recordedByDeviceId: String

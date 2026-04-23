@@ -5,6 +5,7 @@ struct SessionSetupView: View {
     @Binding var path: NavigationPath
     @Query(sort: \Session.date, order: .reverse) private var sessions: [Session]
     @Environment(\.modelContext) private var modelContext
+    @Environment(SyncCoordinator.self) private var syncCoordinator
 
     @State private var showingNewSession = false
     @State private var newSessionName = ""
@@ -49,25 +50,40 @@ struct SessionSetupView: View {
 
     private func createSession() {
         guard !newSessionName.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-        let session = Session(name: newSessionName)
-        modelContext.insert(session)
+        let sessionId = UUID()
+        let startId = UUID()
+        let finishId = UUID()
+        let name = newSessionName
 
-        // Auto-create Start and Finish checkpoints
-        let start = Checkpoint(indexInCourse: 0, name: "Start")
-        start.session = session
-        modelContext.insert(start)
-
-        let finish = Checkpoint(indexInCourse: 1, name: "Finish")
-        finish.session = session
-        modelContext.insert(finish)
+        syncCoordinator.apply([
+            .sessionUpserted(SessionPayload(
+                sessionId: sessionId,
+                name: name,
+                date: .now,
+                courseName: "",
+                notes: ""
+            )),
+            .checkpointUpserted(CheckpointPayload(
+                checkpointId: startId,
+                sessionId: sessionId,
+                indexInCourse: 0,
+                name: "Start"
+            )),
+            .checkpointUpserted(CheckpointPayload(
+                checkpointId: finishId,
+                sessionId: sessionId,
+                indexInCourse: 1,
+                name: "Finish"
+            )),
+        ])
 
         newSessionName = ""
-        path.append(Route.sessionDetail(session.id))
+        path.append(Route.sessionDetail(sessionId))
     }
 
     private func deleteSessions(at offsets: IndexSet) {
         for index in offsets {
-            modelContext.delete(sessions[index])
+            syncCoordinator.apply(.sessionDeleted(EntityIdPayload(id: sessions[index].id)))
         }
     }
 }

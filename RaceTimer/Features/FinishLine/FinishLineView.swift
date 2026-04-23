@@ -7,6 +7,7 @@ struct FinishLineView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(RoleCoordinator.self) private var roleCoordinator
+    @Environment(SyncCoordinator.self) private var syncCoordinator
 
     @State private var session: Session?
     @State private var finishCheckpoint: Checkpoint?
@@ -80,21 +81,27 @@ struct FinishLineView: View {
         let expectedRider = expectedRiders.first
         let run = session.runs.first { $0.rider?.id == expectedRider?.id && $0.status == .started }
 
-        let event = CheckpointEvent(
-            timestamp: timestamp,
-            recordedByDeviceId: roleCoordinator.deviceId,
-            autoAssignedRiderId: expectedRider?.id
-        )
-        event.run = run
-        event.checkpoint = cp
-        modelContext.insert(event)
-
+        let eventId = UUID()
+        var payloads: [SyncPayload] = [
+            .checkpointEventRecorded(CheckpointEventPayload(
+                eventId: eventId,
+                runId: run?.id,
+                checkpointId: cp.id,
+                timestamp: timestamp,
+                recordedByDeviceId: roleCoordinator.deviceId,
+                autoAssignedRiderId: expectedRider?.id
+            ))
+        ]
         if let run {
-            run.status = .finished
+            payloads.append(.runStatusChanged(RunStatusPayload(
+                runId: run.id,
+                status: RunStatus.finished.rawValue
+            )))
         }
+        syncCoordinator.apply(payloads)
 
         let record = FinishRecord(
-            id: event.id,
+            id: eventId,
             riderName: expectedRider?.displayName ?? "Unknown",
             timestamp: timestamp,
             totalTime: run?.totalTime
@@ -104,13 +111,19 @@ struct FinishLineView: View {
     }
 
     private func deleteFinish(at offsets: IndexSet) {
+        var payloads: [SyncPayload] = []
         for index in offsets {
             let record = recentFinishes[index]
-            let eid = record.id
-            if let event = try? modelContext.fetchByID(CheckpointEvent.self, id: eid) {
-                event.deleted = true
-            }
+            payloads.append(.checkpointEventEdited(CheckpointEventEditPayload(
+                eventId: record.id,
+                reassignedRunId: nil,
+                deleted: true,
+                ignored: nil,
+                manualOverride: nil,
+                note: nil
+            )))
         }
+        syncCoordinator.apply(payloads)
         recentFinishes.remove(atOffsets: offsets)
         rebuildExpected()
     }

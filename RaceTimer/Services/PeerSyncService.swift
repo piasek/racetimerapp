@@ -22,6 +22,9 @@ final class PeerSyncService: NSObject {
     private(set) var isActive = false
 
     var onEventsReceived: (([SyncEventTransfer]) -> Void)?
+    /// Called when a peer finishes connecting. Coordinator uses this to push
+    /// its full local event log to the new peer for catch-up.
+    var onPeerConnected: ((MCPeerID) -> Void)?
 
     private let logger = Logger(subsystem: "com.racetimerapp", category: "PeerSync")
 
@@ -32,14 +35,15 @@ final class PeerSyncService: NSObject {
 
     // MARK: - Start / Stop
 
-    func start(deviceId: String, role: String) {
+    func start(deviceId: String, role: String, sessionId: String? = nil) {
         guard !isActive else { return }
 
         let session = MCSession(peer: peerId, securityIdentity: nil, encryptionPreference: .required)
         session.delegate = self
         self.session = session
 
-        let discoveryInfo = ["deviceId": deviceId, "role": role]
+        var discoveryInfo = ["deviceId": deviceId, "role": role]
+        if let sessionId { discoveryInfo["sessionId"] = sessionId }
 
         let advertiser = MCNearbyServiceAdvertiser(
             peer: peerId,
@@ -73,23 +77,21 @@ final class PeerSyncService: NSObject {
 
     // MARK: - Send events
 
+    /// Broadcast events to all currently-connected peers.
     func sendEvents(_ events: [SyncEventTransfer]) {
-        guard let session, !session.connectedPeers.isEmpty else { return }
-        do {
-            let data = try JSONEncoder().encode(events)
-            try session.send(data, toPeers: session.connectedPeers, with: .reliable)
-            logger.info("Sent \(events.count) events to \(session.connectedPeers.count) peers")
-        } catch {
-            logger.error("Failed to send events: \(error.localizedDescription)")
-        }
+        guard let session, !session.connectedPeers.isEmpty, !events.isEmpty else { return }
+        sendEvents(events, to: session.connectedPeers)
     }
 
-    /// Request a full sync from all connected peers.
-    func requestFullSync() {
-        guard let session, !session.connectedPeers.isEmpty else { return }
-        let request = SyncRequest(type: .fullSync)
-        if let data = try? JSONEncoder().encode(request) {
-            try? session.send(data, toPeers: session.connectedPeers, with: .reliable)
+    /// Send events to specific peers only (used for per-peer full-sync catch-up).
+    func sendEvents(_ events: [SyncEventTransfer], to peers: [MCPeerID]) {
+        guard let session, !peers.isEmpty, !events.isEmpty else { return }
+        do {
+            let data = try JSONEncoder().encode(events)
+            try session.send(data, toPeers: peers, with: .reliable)
+            logger.info("Sent \(events.count) events to \(peers.count) peers")
+        } catch {
+            logger.error("Failed to send events: \(error.localizedDescription)")
         }
     }
 }
@@ -103,6 +105,7 @@ extension PeerSyncService: MCSessionDelegate {
             switch state {
             case .connected:
                 logger.info("Peer connected: \(peerID.displayName)")
+                onPeerConnected?(peerID)
             case .notConnected:
                 logger.info("Peer disconnected: \(peerID.displayName)")
             case .connecting:
@@ -162,11 +165,4 @@ struct SyncEventTransfer: Codable, Sendable {
     var wallClockTimestamp: Date
     var payloadType: String
     var payloadJSON: Data
-}
-
-struct SyncRequest: Codable {
-    enum RequestType: String, Codable {
-        case fullSync
-    }
-    var type: RequestType
 }

@@ -4,6 +4,7 @@ import SwiftData
 struct SessionDetailView: View {
     @Binding var path: NavigationPath
     @Environment(\.modelContext) private var modelContext
+    @Environment(SyncCoordinator.self) private var syncCoordinator
 
     let sessionId: UUID
     @State private var session: Session?
@@ -43,12 +44,12 @@ struct SessionDetailView: View {
                 LabeledContent("Name", value: session.name)
                 TextField("Course name", text: $editedCourseName)
                     .onChange(of: editedCourseName) { _, newValue in
-                        session.courseName = newValue
+                        broadcastSessionEdits(session, courseName: newValue, notes: editedNotes)
                     }
                 TextField("Notes", text: $editedNotes, axis: .vertical)
                     .lineLimit(2...4)
                     .onChange(of: editedNotes) { _, newValue in
-                        session.notes = newValue
+                        broadcastSessionEdits(session, courseName: editedCourseName, notes: newValue)
                     }
             }
 
@@ -127,51 +128,81 @@ struct SessionDetailView: View {
         }
     }
 
+    private func broadcastSessionEdits(_ session: Session, courseName: String, notes: String) {
+        syncCoordinator.apply(.sessionUpserted(SessionPayload(
+            sessionId: session.id,
+            name: session.name,
+            date: session.date,
+            courseName: courseName,
+            notes: notes
+        )))
+    }
+
     // MARK: - Checkpoint actions
 
     private func addCheckpoint(to session: Session) {
         let name = newCheckpointName.trimmingCharacters(in: .whitespaces)
         guard !name.isEmpty else { return }
 
-        // Insert before finish: new checkpoint gets second-to-last index
+        // Insert before finish: new checkpoint gets second-to-last index.
         let sorted = session.sortedCheckpoints
-        let insertIndex = max(sorted.count - 1, 1) // before Finish
+        let insertIndex = max(sorted.count - 1, 1)
 
-        // Bump finish index
+        var payloads: [SyncPayload] = []
+
+        // Bump finish index if it collides with the new one.
         if let finish = sorted.last, finish.indexInCourse == insertIndex {
-            finish.indexInCourse = insertIndex + 1
+            payloads.append(.checkpointUpserted(CheckpointPayload(
+                checkpointId: finish.id,
+                sessionId: session.id,
+                indexInCourse: insertIndex + 1,
+                name: finish.name
+            )))
         }
 
-        let cp = Checkpoint(indexInCourse: insertIndex, name: name)
-        cp.session = session
-        modelContext.insert(cp)
+        payloads.append(.checkpointUpserted(CheckpointPayload(
+            checkpointId: UUID(),
+            sessionId: session.id,
+            indexInCourse: insertIndex,
+            name: name
+        )))
+
+        syncCoordinator.apply(payloads)
         newCheckpointName = ""
     }
 
     private func deleteCheckpoints(_ offsets: IndexSet, from session: Session) {
         let sorted = session.sortedCheckpoints
+        var deleteIds: [UUID] = []
         for index in offsets {
             let cp = sorted[index]
-            // Don't allow deleting Start or Finish if they're the only two
             if session.checkpoints.count <= 2 { continue }
             if cp.isStart || cp.isFinish { continue }
-            modelContext.delete(cp)
+            deleteIds.append(cp.id)
         }
-        // Renumber remaining
-        DispatchQueue.main.async {
-            let remaining = session.sortedCheckpoints
-            for (i, cp) in remaining.enumerated() {
-                cp.indexInCourse = i
-            }
+        guard !deleteIds.isEmpty else { return }
+
+        var payloads: [SyncPayload] = deleteIds.map { .checkpointDeleted(EntityIdPayload(id: $0)) }
+
+        // Renumber remaining (excluding those we just deleted) contiguously.
+        let remaining = sorted.filter { !deleteIds.contains($0.id) }
+        for (i, cp) in remaining.enumerated() where cp.indexInCourse != i {
+            payloads.append(.checkpointUpserted(CheckpointPayload(
+                checkpointId: cp.id,
+                sessionId: session.id,
+                indexInCourse: i,
+                name: cp.name
+            )))
         }
+
+        syncCoordinator.apply(payloads)
     }
 
     // MARK: - Rider actions
 
     private func deleteRiders(_ offsets: IndexSet, from session: Session) {
-        for index in offsets {
-            modelContext.delete(session.riders[index])
-        }
+        let ids = offsets.map { session.riders[$0].id }
+        syncCoordinator.apply(ids.map { .riderDeleted(EntityIdPayload(id: $0)) })
     }
 
     @ViewBuilder
@@ -205,14 +236,15 @@ struct SessionDetailView: View {
     }
 
     private func addRider(to session: Session) {
-        let rider = Rider(
+        syncCoordinator.apply(.riderUpserted(RiderPayload(
+            riderId: UUID(),
+            sessionId: session.id,
             firstName: riderFirstName.trimmingCharacters(in: .whitespaces),
             lastName: riderLastName.isEmpty ? nil : riderLastName,
             bibNumber: Int(riderBibString),
-            category: riderCategory.isEmpty ? nil : riderCategory
-        )
-        rider.session = session
-        modelContext.insert(rider)
+            category: riderCategory.isEmpty ? nil : riderCategory,
+            notes: nil
+        )))
         clearRiderForm()
         showingAddRider = false
     }

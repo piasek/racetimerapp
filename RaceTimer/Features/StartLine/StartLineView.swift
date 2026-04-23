@@ -6,6 +6,7 @@ struct StartLineView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(RoleCoordinator.self) private var roleCoordinator
+    @Environment(SyncCoordinator.self) private var syncCoordinator
 
     @State private var session: Session?
     @State private var riderQueue: [Rider] = []
@@ -96,18 +97,25 @@ struct StartLineView: View {
         let startCheckpoint = session.sortedCheckpoints.first { $0.isStart }
         guard let cp = startCheckpoint else { return }
 
-        let run = Run(status: .started)
-        run.rider = rider
-        run.session = session
-        modelContext.insert(run)
+        let runId = UUID()
+        let eventId = UUID()
 
-        let event = CheckpointEvent(
-            timestamp: .now,
-            recordedByDeviceId: roleCoordinator.deviceId
-        )
-        event.run = run
-        event.checkpoint = cp
-        modelContext.insert(event)
+        syncCoordinator.apply([
+            .runCreated(RunPayload(
+                runId: runId,
+                sessionId: session.id,
+                riderId: rider.id,
+                status: RunStatus.started.rawValue
+            )),
+            .checkpointEventRecorded(CheckpointEventPayload(
+                eventId: eventId,
+                runId: runId,
+                checkpointId: cp.id,
+                timestamp: .now,
+                recordedByDeviceId: roleCoordinator.deviceId,
+                autoAssignedRiderId: rider.id
+            )),
+        ])
 
         lastSendTime = .now
         startGapTimer()

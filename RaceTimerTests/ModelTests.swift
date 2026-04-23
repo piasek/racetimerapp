@@ -15,6 +15,7 @@ func makeTestContainer() throws -> ModelContainer {
 
 // MARK: - Run splits & total time
 
+@MainActor
 struct RunResultsTests {
     @Test func totalTimeFromStartToFinish() throws {
         let container = try makeTestContainer()
@@ -153,6 +154,7 @@ struct RunStatusTests {
 
 // MARK: - Projection engine
 
+@MainActor
 struct ProjectionEngineTests {
     @Test func projectionAppliesRiderUpsert() throws {
         let container = try makeTestContainer()
@@ -164,6 +166,7 @@ struct ProjectionEngineTests {
             lamportClock: 1,
             payload: .riderUpserted(RiderPayload(
                 riderId: riderId,
+                sessionId: UUID(),
                 firstName: "Eve",
                 lastName: "Smith",
                 bibNumber: 7
@@ -187,7 +190,7 @@ struct ProjectionEngineTests {
         let event = SyncEvent(
             deviceId: "d1",
             lamportClock: 1,
-            payload: .riderUpserted(RiderPayload(riderId: riderId, firstName: "Eve"))
+            payload: .riderUpserted(RiderPayload(riderId: riderId, sessionId: UUID(), firstName: "Eve"))
         )
         context.insert(event)
 
@@ -202,15 +205,16 @@ struct ProjectionEngineTests {
         let context = container.mainContext
 
         let riderId = UUID()
+        let sessionId = UUID()
         let e1 = SyncEvent(
             deviceId: "d1",
             lamportClock: 1,
-            payload: .riderUpserted(RiderPayload(riderId: riderId, firstName: "Eve"))
+            payload: .riderUpserted(RiderPayload(riderId: riderId, sessionId: sessionId, firstName: "Eve"))
         )
         let e2 = SyncEvent(
             deviceId: "d2",
             lamportClock: 2,
-            payload: .riderUpserted(RiderPayload(riderId: riderId, firstName: "Updated"))
+            payload: .riderUpserted(RiderPayload(riderId: riderId, sessionId: sessionId, firstName: "Updated"))
         )
         context.insert(e1)
         context.insert(e2)
@@ -221,5 +225,27 @@ struct ProjectionEngineTests {
         let riders = try context.fetch(FetchDescriptor<Rider>())
         #expect(riders.count == 1)
         #expect(riders.first?.firstName == "Updated")
+    }
+}
+
+// MARK: - ModelContext.fetchByID
+
+@MainActor
+struct FetchByIDTests {
+    @Test func fetchesCorrectSessionWhenMultipleExist() throws {
+        let container = try makeTestContainer()
+        let context = container.mainContext
+
+        let first = Session(name: "First")
+        let second = Session(name: "Second")
+        context.insert(first)
+        context.insert(second)
+        try context.save()
+
+        let fetchedFirst = try context.fetchByID(Session.self, id: first.id)
+        let fetchedSecond = try context.fetchByID(Session.self, id: second.id)
+
+        #expect(fetchedFirst?.id == first.id)
+        #expect(fetchedSecond?.id == second.id)
     }
 }

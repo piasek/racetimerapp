@@ -7,7 +7,7 @@ import SwiftData
 struct ProjectionEngine {
 
     /// Apply a sorted sequence of SyncEvents to the given ModelContext,
-    /// upserting Riders, Runs, and CheckpointEvents.
+    /// upserting Sessions, Checkpoints, Riders, Runs, and CheckpointEvents.
     static func rebuild(from events: [SyncEvent], in context: ModelContext) throws {
         let sorted = events.sorted { lhs, rhs in
             if lhs.lamportClock != rhs.lamportClock {
@@ -19,10 +19,22 @@ struct ProjectionEngine {
         for event in sorted {
             guard let payload = event.payload else { continue }
             switch payload {
+            case .sessionUpserted(let p):
+                try applySessionUpserted(p, in: context)
+            case .sessionDeleted(let p):
+                try applyEntityDeleted(Session.self, id: p.id, in: context)
+            case .checkpointUpserted(let p):
+                try applyCheckpointUpserted(p, in: context)
+            case .checkpointDeleted(let p):
+                try applyEntityDeleted(Checkpoint.self, id: p.id, in: context)
             case .riderUpserted(let p):
-                try applyRiderUpserted(p, clock: event.lamportClock, deviceId: event.deviceId, in: context)
+                try applyRiderUpserted(p, in: context)
+            case .riderDeleted(let p):
+                try applyEntityDeleted(Rider.self, id: p.id, in: context)
             case .runCreated(let p):
                 try applyRunCreated(p, in: context)
+            case .runDeleted(let p):
+                try applyEntityDeleted(Run.self, id: p.id, in: context)
             case .checkpointEventRecorded(let p):
                 try applyCheckpointEventRecorded(p, in: context)
             case .checkpointEventEdited(let p):
@@ -35,18 +47,46 @@ struct ProjectionEngine {
 
     // MARK: - Apply individual event types
 
-    private static func applyRiderUpserted(
-        _ p: RiderPayload,
-        clock: Int,
-        deviceId: String,
-        in context: ModelContext
-    ) throws {
+    private static func applySessionUpserted(_ p: SessionPayload, in context: ModelContext) throws {
+        if let existing = try fetchSession(id: p.sessionId, in: context) {
+            existing.name = p.name
+            existing.date = p.date
+            existing.courseName = p.courseName
+            existing.notes = p.notes
+        } else {
+            let session = Session(
+                id: p.sessionId,
+                name: p.name,
+                date: p.date,
+                courseName: p.courseName,
+                notes: p.notes
+            )
+            context.insert(session)
+        }
+    }
+
+    private static func applyCheckpointUpserted(_ p: CheckpointPayload, in context: ModelContext) throws {
+        let parentSession = try fetchSession(id: p.sessionId, in: context)
+        if let existing = try fetchCheckpoint(id: p.checkpointId, in: context) {
+            existing.indexInCourse = p.indexInCourse
+            existing.name = p.name
+            existing.session = parentSession
+        } else {
+            let cp = Checkpoint(id: p.checkpointId, indexInCourse: p.indexInCourse, name: p.name)
+            cp.session = parentSession
+            context.insert(cp)
+        }
+    }
+
+    private static func applyRiderUpserted(_ p: RiderPayload, in context: ModelContext) throws {
+        let parentSession = try fetchSession(id: p.sessionId, in: context)
         if let existing = try fetchRider(id: p.riderId, in: context) {
             existing.firstName = p.firstName
             existing.lastName = p.lastName
             existing.bibNumber = p.bibNumber
             existing.category = p.category
             existing.notes = p.notes
+            existing.session = parentSession
         } else {
             let rider = Rider(
                 id: p.riderId,
@@ -56,6 +96,7 @@ struct ProjectionEngine {
                 category: p.category,
                 notes: p.notes
             )
+            rider.session = parentSession
             context.insert(rider)
         }
     }
@@ -64,6 +105,7 @@ struct ProjectionEngine {
         guard try fetchRun(id: p.runId, in: context) == nil else { return }
         let run = Run(id: p.runId, status: RunStatus(rawValue: p.status) ?? .scheduled)
         run.rider = try fetchRider(id: p.riderId, in: context)
+        run.session = try fetchSession(id: p.sessionId, in: context)
         context.insert(run)
     }
 
@@ -78,7 +120,9 @@ struct ProjectionEngine {
             recordedByDeviceId: p.recordedByDeviceId,
             autoAssignedRiderId: p.autoAssignedRiderId
         )
-        event.run = try fetchRun(id: p.runId, in: context)
+        if let runId = p.runId {
+            event.run = try fetchRun(id: runId, in: context)
+        }
         event.checkpoint = try fetchCheckpoint(id: p.checkpointId, in: context)
         context.insert(event)
     }
@@ -103,7 +147,24 @@ struct ProjectionEngine {
         run.status = RunStatus(rawValue: p.status) ?? run.status
     }
 
+    /// Generic tombstone handler: physically delete if still present.
+    /// Idempotent — subsequent replays are no-ops; subsequent upsert replays
+    /// re-create but the delete event (at higher Lamport) removes again.
+    private static func applyEntityDeleted<T: PersistentModel>(
+        _ type: T.Type,
+        id: UUID,
+        in context: ModelContext
+    ) throws where T: Identifiable, T.ID == UUID {
+        if let existing = try context.fetchByID(type, id: id) {
+            context.delete(existing)
+        }
+    }
+
     // MARK: - Fetch helpers
+
+    private static func fetchSession(id: UUID, in context: ModelContext) throws -> Session? {
+        try context.fetchByID(Session.self, id: id)
+    }
 
     private static func fetchRider(id: UUID, in context: ModelContext) throws -> Rider? {
         try context.fetchByID(Rider.self, id: id)
