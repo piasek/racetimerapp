@@ -66,7 +66,7 @@
 		5C4798E2C7B2AF32419F529B /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		61F9D342C2A51F78E78CFA42 /* SyncEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEngine.swift; sourceTree = "<group>"; };
 		678F5637A2A4CCB7A721F28C /* ServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceTests.swift; sourceTree = "<group>"; };
-		828ED7C247A0877BA6E4E39C /* RaceTimer.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = RaceTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		828ED7C247A0877BA6E4E39C /* RaceTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RaceTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		89087C9542BF155D3BA40289 /* Run.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Run.swift; sourceTree = "<group>"; };
 		8BC2CAEC615E0CA225879BB1 /* RaceTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaceTimerTests.swift; sourceTree = "<group>"; };
 		8E32A59242FE6487205D9868 /* SyncStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusView.swift; sourceTree = "<group>"; };
@@ -76,7 +76,7 @@
 		B7BCB92E91E4C18FDE72574A /* RoleCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoleCoordinator.swift; sourceTree = "<group>"; };
 		BC8D13599E8CB70A79E14B83 /* ClockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClockService.swift; sourceTree = "<group>"; };
 		C4DFA58A64AF2AC7C146AC80 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		C75FD7D4B915630D4D6E46E7 /* RaceTimerTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = RaceTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C75FD7D4B915630D4D6E46E7 /* RaceTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RaceTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFBC572EFA80506A03491841 /* SharedComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedComponents.swift; sourceTree = "<group>"; };
 		CFE6C383C83E043F6BB52BC5 /* PeerSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerSyncService.swift; sourceTree = "<group>"; };
 		D1F4D039D397E0904D694D11 /* ExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportView.swift; sourceTree = "<group>"; };
@@ -325,7 +325,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					14237D3F7B7B1EC60BB1B949 = {
 						DevelopmentTeam = RL25SWA85T;
@@ -447,6 +447,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -460,6 +461,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
@@ -530,6 +532,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -550,6 +553,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;

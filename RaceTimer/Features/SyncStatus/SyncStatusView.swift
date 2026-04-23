@@ -106,41 +106,79 @@ private struct PeerRow: View {
     }
 }
 
-/// Toolbar button + sheet wrapper. Badge shows connected-peer count.
-struct SyncStatusToolbarButton: View {
+/// Persistent low-profile sync status strip. Designed to sit under the
+/// navigation bar via `.safeAreaInset(edge: .top)` so every screen shows
+/// at-a-glance peer connection state. Tap to open the full SyncStatusView.
+struct SyncStatusBar: View {
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @State private var showing = false
 
     var body: some View {
+        let summary = makeSummary()
         Button {
             showing = true
         } label: {
-            Image(systemName: iconName)
-                .symbolRenderingMode(.hierarchical)
-                .overlay(alignment: .topTrailing) {
-                    if connectedCount > 0 {
-                        Text("\(connectedCount)")
-                            .font(.caption2.bold())
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 4)
-                            .background(Capsule().fill(Color.green))
-                            .offset(x: 8, y: -6)
-                    }
-                }
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(summary.color)
+                    .frame(width: 8, height: 8)
+                Text(summary.label)
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.primary)
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .background {
+                summary.color.opacity(0.10)
+                    .background(.ultraThinMaterial)
+            }
+            .overlay(alignment: .bottom) {
+                Divider()
+            }
         }
-        .accessibilityLabel("Sync status")
+        .buttonStyle(.plain)
+        .accessibilityLabel("Sync status: \(summary.label)")
+        .accessibilityHint("Opens sync details")
         .sheet(isPresented: $showing) {
             SyncStatusView()
         }
     }
 
-    private var connectedCount: Int {
-        syncCoordinator.peerSync.discoveredPeers.filter { $0.state == .connected }.count
+    private struct Summary {
+        let label: String
+        let color: Color
     }
 
-    private var iconName: String {
-        connectedCount > 0
-            ? "antenna.radiowaves.left.and.right"
-            : "antenna.radiowaves.left.and.right.slash"
+    private func makeSummary() -> Summary {
+        let peers = syncCoordinator.peerSync.discoveredPeers
+        let connected = peers.filter { $0.state == .connected }.count
+        let connecting = peers.filter { $0.state == .connecting }.count
+
+        guard syncCoordinator.peerSync.isActive else {
+            return Summary(label: "Sync off", color: .red)
+        }
+        if connected > 0 {
+            let plural = connected == 1 ? "peer" : "peers"
+            return Summary(label: "\(connected) \(plural) connected", color: .green)
+        }
+        if connecting > 0 {
+            return Summary(label: "Connecting…", color: .orange)
+        }
+        return Summary(label: "Searching for peers…", color: .secondary)
+    }
+}
+
+extension View {
+    /// Pin a persistent sync status strip above content. Apply once at the
+    /// NavigationStack root so it appears on every screen.
+    func syncStatusBar() -> some View {
+        safeAreaInset(edge: .top, spacing: 0) {
+            SyncStatusBar()
+        }
     }
 }
