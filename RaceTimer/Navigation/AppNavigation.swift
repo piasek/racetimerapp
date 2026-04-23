@@ -48,11 +48,15 @@ struct AppNavigation: View {
         .onChange(of: roleCoordinator.currentRole) { _, _ in startSyncIfPossible() }
     }
 
-    /// Gate transport on having an active session so peers don't silently
-    /// exchange data across unrelated sessions. Idempotent — PeerSyncService.start
-    /// no-ops when already active.
+    /// Start the MC transport as soon as the app is up so users can see
+    /// nearby devices from the Sessions screen (and diagnose connectivity).
+    /// PeerSyncService.start is idempotent — first call advertises+browses;
+    /// later calls are no-ops. Session-scoped invite filtering is tracked
+    /// separately (see deferred todo `session-scoped-invites`).
     private func startSyncIfPossible() {
-        guard let sid = roleCoordinator.activeSessionId else { return }
-        syncCoordinator.start(role: roleCoordinator.currentRole.rawValue, activeSessionId: sid)
+        syncCoordinator.start(
+            role: roleCoordinator.currentRole.rawValue,
+            activeSessionId: roleCoordinator.activeSessionId
+        )
     }
 }

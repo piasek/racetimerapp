@@ -38,6 +38,9 @@ struct SessionSetupView: View {
                     Image(systemName: "plus")
                 }
             }
+            ToolbarItem(placement: .topBarLeading) {
+                SyncStatusToolbarButton()
+            }
         }
         .alert("New Session", isPresented: $showingNewSession) {
             TextField("Session name", text: $newSessionName)

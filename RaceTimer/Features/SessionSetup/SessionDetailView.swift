@@ -123,6 +123,11 @@ struct SessionDetailView: View {
             }
         }
         .navigationTitle(session.name)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                SyncStatusToolbarButton()
+            }
+        }
         .sheet(isPresented: $showingAddRider) {
             addRiderSheet(session)
         }

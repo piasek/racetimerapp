@@ -29,6 +29,12 @@ final class SyncCoordinator {
 
     private(set) var isStarted = false
 
+    // MARK: - Observable sync stats (for UI)
+    private(set) var eventsSent: Int = 0
+    private(set) var eventsReceived: Int = 0
+    private(set) var lastSentAt: Date?
+    private(set) var lastReceivedAt: Date?
+
     init(modelContext: ModelContext, deviceId: String) {
         self.modelContext = modelContext
         self.deviceId = deviceId
@@ -79,6 +85,10 @@ final class SyncCoordinator {
             logger.error("Local apply failed: \(error.localizedDescription)")
         }
         peerSync.sendEvents(transfers)
+        if !transfers.isEmpty {
+            eventsSent += transfers.count
+            lastSentAt = Date()
+        }
         return transfers
     }
 
@@ -97,6 +107,8 @@ final class SyncCoordinator {
         do {
             try syncEngine.mergeRemote(transfers, in: modelContext)
             try modelContext.save()
+            eventsReceived += transfers.count
+            lastReceivedAt = Date()
         } catch {
             logger.error("Remote merge failed: \(error.localizedDescription)")
         }
@@ -107,6 +119,8 @@ final class SyncCoordinator {
             let all = try syncEngine.allLocalEvents(in: modelContext)
             if !all.isEmpty {
                 peerSync.sendEvents(all, to: peers)
+                eventsSent += all.count
+                lastSentAt = Date()
                 logger.info("Pushed full log (\(all.count) events) to new peer(s)")
             }
         } catch {

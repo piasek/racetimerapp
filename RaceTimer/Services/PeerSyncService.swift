@@ -19,12 +19,22 @@ final class PeerSyncService: NSObject {
     private var browser: MCNearbyServiceBrowser?
 
     private(set) var connectedPeers: [MCPeerID] = []
+    /// Peers seen by the browser (not yet connected). Keyed by MCPeerID.
+    private(set) var discoveredPeers: [DiscoveredPeer] = []
     private(set) var isActive = false
+
+    var localDisplayName: String { peerId.displayName }
 
     var onEventsReceived: (([SyncEventTransfer]) -> Void)?
     /// Called when a peer finishes connecting. Coordinator uses this to push
     /// its full local event log to the new peer for catch-up.
     var onPeerConnected: ((MCPeerID) -> Void)?
+
+    /// Internal bookkeeping of peer info seen by the browser (discovery payload).
+    /// Used to populate `DiscoveredPeer` entries with role/sessionId.
+    private var peerInfo: [MCPeerID: [String: String]] = [:]
+    /// Raw per-peer state driven by MCSessionState transitions + browser events.
+    private var peerStates: [MCPeerID: DiscoveredPeer.State] = [:]
 
     private let logger = Logger(subsystem: "com.racetimerapp", category: "PeerSync")
 
@@ -71,8 +81,25 @@ final class PeerSyncService: NSObject {
         browser = nil
         session = nil
         connectedPeers = []
+        discoveredPeers = []
+        peerInfo.removeAll()
+        peerStates.removeAll()
         isActive = false
         logger.info("Peer sync stopped")
+    }
+
+    private func refreshDiscoveredPeers() {
+        discoveredPeers = peerStates
+            .map { (peer, state) in
+                DiscoveredPeer(
+                    displayName: peer.displayName,
+                    state: state,
+                    role: peerInfo[peer]?["role"],
+                    sessionId: peerInfo[peer]?["sessionId"],
+                    deviceId: peerInfo[peer]?["deviceId"]
+                )
+            }
+            .sorted { $0.displayName < $1.displayName }
     }
 
     // MARK: - Send events
@@ -104,15 +131,24 @@ extension PeerSyncService: MCSessionDelegate {
             connectedPeers = session.connectedPeers
             switch state {
             case .connected:
+                peerStates[peerID] = .connected
                 logger.info("Peer connected: \(peerID.displayName)")
                 onPeerConnected?(peerID)
             case .notConnected:
+                // Keep the peer in "discovered" if the browser still sees it; otherwise drop.
+                if peerInfo[peerID] != nil {
+                    peerStates[peerID] = .discovered
+                } else {
+                    peerStates.removeValue(forKey: peerID)
+                }
                 logger.info("Peer disconnected: \(peerID.displayName)")
             case .connecting:
+                peerStates[peerID] = .connecting
                 logger.info("Peer connecting: \(peerID.displayName)")
             @unknown default:
                 break
             }
+            refreshDiscoveredPeers()
         }
     }
 
@@ -144,6 +180,9 @@ extension PeerSyncService: MCNearbyServiceBrowserDelegate {
     nonisolated func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
         Task { @MainActor in
             logger.info("Found peer: \(peerID.displayName)")
+            peerInfo[peerID] = info ?? [:]
+            if peerStates[peerID] == nil { peerStates[peerID] = .discovered }
+            refreshDiscoveredPeers()
             guard let session else { return }
             browser.invitePeer(peerID, to: session, withContext: nil, timeout: 10)
         }
@@ -152,6 +191,12 @@ extension PeerSyncService: MCNearbyServiceBrowserDelegate {
     nonisolated func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         Task { @MainActor in
             logger.info("Lost peer: \(peerID.displayName)")
+            peerInfo.removeValue(forKey: peerID)
+            // If not currently connected, remove from state map entirely.
+            if peerStates[peerID] != .connected {
+                peerStates.removeValue(forKey: peerID)
+            }
+            refreshDiscoveredPeers()
         }
     }
 }
@@ -165,4 +210,16 @@ struct SyncEventTransfer: Codable, Sendable {
     var wallClockTimestamp: Date
     var payloadType: String
     var payloadJSON: Data
+}
+
+/// Lightweight snapshot of a peer we've seen over the network, exposed for UI.
+struct DiscoveredPeer: Identifiable, Hashable {
+    enum State: String { case discovered, connecting, connected }
+    let displayName: String
+    let state: State
+    let role: String?
+    let sessionId: String?
+    let deviceId: String?
+
+    var id: String { displayName }
 }
