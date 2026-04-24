@@ -6,13 +6,22 @@ final class Checkpoint {
     @Attribute(.unique) var id: UUID
     var indexInCourse: Int
     var name: String
+    /// Device that implicitly created this checkpoint (nil for Start/Finish
+    /// or any checkpoint provisioned by the session organizer).
+    var createdByDeviceId: String?
 
     var session: Session?
 
-    init(id: UUID = UUID(), indexInCourse: Int, name: String) {
+    init(
+        id: UUID = UUID(),
+        indexInCourse: Int,
+        name: String,
+        createdByDeviceId: String? = nil
+    ) {
         self.id = id
         self.indexInCourse = indexInCourse
         self.name = name
+        self.createdByDeviceId = createdByDeviceId
     }
 
     var isStart: Bool { indexInCourse == 0 }

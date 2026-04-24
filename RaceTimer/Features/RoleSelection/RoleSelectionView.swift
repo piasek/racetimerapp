@@ -7,10 +7,9 @@ struct RoleSelectionView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(RoleCoordinator.self) private var roleCoordinator
+    @Environment(SyncCoordinator.self) private var syncCoordinator
 
     @State private var session: Session?
-    @State private var selectedCheckpointId: UUID?
-    @State private var showCheckpointPicker = false
 
     var body: some View {
         List {
@@ -40,7 +39,7 @@ struct RoleSelectionView: View {
                     icon: "mappin.circle.fill",
                     color: .orange
                 ) {
-                    showCheckpointPicker = true
+                    enterCheckpointRole()
                 }
 
                 roleRow(
@@ -66,47 +65,50 @@ struct RoleSelectionView: View {
         }
         .navigationTitle("Select Role")
         .onAppear { loadSession() }
-        .sheet(isPresented: $showCheckpointPicker) {
-            checkpointPickerSheet
-        }
     }
 
-    // MARK: - Checkpoint picker
+    // MARK: - Checkpoint role (implicit per-device checkpoint)
 
-    @ViewBuilder
-    private var checkpointPickerSheet: some View {
-        NavigationStack {
-            List {
-                if let session {
-                    let intermediates = session.sortedCheckpoints.filter { !$0.isStart && !$0.isFinish }
-                    if intermediates.isEmpty {
-                        ContentUnavailableView(
-                            "No Intermediate Checkpoints",
-                            systemImage: "mappin.slash",
-                            description: Text("Add checkpoints in session setup first.")
-                        )
-                    } else {
-                        ForEach(intermediates) { cp in
-                            Button {
-                                selectedCheckpointId = cp.id
-                                showCheckpointPicker = false
-                                selectRole(.checkpoint, checkpointId: cp.id)
-                            } label: {
-                                Label(cp.name, systemImage: "mappin.circle.fill")
-                            }
-                        }
-                    }
-                }
+    /// Find this device's checkpoint for the session (matched by deviceId),
+    /// or implicitly create one named after the device's display name.
+    /// Then push CheckpointCaptureView for that checkpoint.
+    private func enterCheckpointRole() {
+        guard let session else { return }
+        let myDeviceId = roleCoordinator.deviceId
+
+        let existing = session.checkpoints.first { $0.createdByDeviceId == myDeviceId }
+        let cpId: UUID
+
+        if let existing {
+            cpId = existing.id
+        } else {
+            cpId = UUID()
+            let sorted = session.sortedCheckpoints
+            // Insert before the finish: take the current finish's index, push
+            // finish out by one. If there is no finish yet, fall back to 1.
+            let insertIndex = max(sorted.count - 1, 1)
+
+            var payloads: [SyncPayload] = []
+            if let finish = sorted.last, finish.indexInCourse == insertIndex {
+                payloads.append(.checkpointUpserted(CheckpointPayload(
+                    checkpointId: finish.id,
+                    sessionId: session.id,
+                    indexInCourse: insertIndex + 1,
+                    name: finish.name,
+                    createdByDeviceId: finish.createdByDeviceId
+                )))
             }
-            .navigationTitle("Pick Checkpoint")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showCheckpointPicker = false }
-                }
-            }
+            payloads.append(.checkpointUpserted(CheckpointPayload(
+                checkpointId: cpId,
+                sessionId: session.id,
+                indexInCourse: insertIndex,
+                name: "Checkpoint - \(roleCoordinator.displayName)",
+                createdByDeviceId: myDeviceId
+            )))
+            syncCoordinator.apply(payloads)
         }
-        .presentationDetents([.medium])
+
+        selectRole(.checkpoint, checkpointId: cpId)
     }
 
     // MARK: - Helpers

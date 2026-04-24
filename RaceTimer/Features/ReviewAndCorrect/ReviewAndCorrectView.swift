@@ -120,7 +120,7 @@ private struct RunDetailSheet: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(event.checkpoint?.name ?? "?")
                     .font(.body)
-                    .strikethrough(event.deleted || event.ignored)
+                    .strikethrough(event.isTombstoned || event.ignored)
                 Text(event.timestamp, style: .time)
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(.secondary)
@@ -144,10 +144,10 @@ private struct RunDetailSheet: View {
             .buttonStyle(.borderless)
 
             Button {
-                event.deleted.toggle()
+                event.isTombstoned.toggle()
             } label: {
-                Image(systemName: event.deleted ? "trash.fill" : "trash")
-                    .foregroundStyle(event.deleted ? .red : .secondary)
+                Image(systemName: event.isTombstoned ? "trash.fill" : "trash")
+                    .foregroundStyle(event.isTombstoned ? .red : .secondary)
             }
             .buttonStyle(.borderless)
         }

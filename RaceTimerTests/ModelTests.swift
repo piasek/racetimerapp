@@ -88,7 +88,7 @@ struct RunResultsTests {
         e0.checkpoint = cp0
         context.insert(e0)
 
-        let e1 = CheckpointEvent(timestamp: Date(timeIntervalSince1970: 200), recordedByDeviceId: "d1", deleted: true)
+        let e1 = CheckpointEvent(timestamp: Date(timeIntervalSince1970: 200), recordedByDeviceId: "d1", isTombstoned: true)
         e1.run = run
         e1.checkpoint = cp1
         context.insert(e1)

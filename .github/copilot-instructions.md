@@ -76,6 +76,10 @@ Each event carries `(deviceId, lamportClock, wallClockTimestamp)`. Merge rule: *
 - **Rider identity**: `firstName` is required; at least one of `{bibNumber, lastName}` should be present for disambiguation.
 - **Feature structure**: each feature folder contains its SwiftUI views and corresponding view models. Keep views thin — business logic goes in Services or view models.
 
+## Implementation
+- When fixing bugs, ensure that tests exist which reproduce the behavior before implementing.
+- After implementation, verify by running tests.
+
 ## Testing
 
 - Unit tests for: results computation, auto-assign algorithm, SyncEngine merge (property-style with shuffled event orderings), edit operations producing correct projections.

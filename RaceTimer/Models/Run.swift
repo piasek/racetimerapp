@@ -35,7 +35,7 @@ final class Run {
     /// Non-deleted, non-ignored events sorted by checkpoint index.
     var effectiveEvents: [CheckpointEvent] {
         events
-            .filter { !$0.deleted && !$0.ignored }
+            .filter { !$0.isTombstoned && !$0.ignored }
             .sorted { ($0.checkpoint?.indexInCourse ?? 0) < ($1.checkpoint?.indexInCourse ?? 0) }
     }
 

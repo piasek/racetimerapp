@@ -69,8 +69,16 @@ struct ProjectionEngine {
             existing.indexInCourse = p.indexInCourse
             existing.name = p.name
             existing.session = parentSession
+            if let device = p.createdByDeviceId {
+                existing.createdByDeviceId = device
+            }
         } else {
-            let cp = Checkpoint(id: p.checkpointId, indexInCourse: p.indexInCourse, name: p.name)
+            let cp = Checkpoint(
+                id: p.checkpointId,
+                indexInCourse: p.indexInCourse,
+                name: p.name,
+                createdByDeviceId: p.createdByDeviceId
+            )
             cp.session = parentSession
             context.insert(cp)
         }
@@ -134,7 +142,7 @@ struct ProjectionEngine {
             event.run = try fetchRun(id: reassignedRunId, in: context)
             event.manualOverride = true
         }
-        if let deleted = p.deleted { event.deleted = deleted }
+        if let deleted = p.deleted { event.isTombstoned = deleted }
         if let ignored = p.ignored { event.ignored = ignored }
         if let manualOverride = p.manualOverride { event.manualOverride = manualOverride }
         if let note = p.note { event.note = note }

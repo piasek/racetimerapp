@@ -9,9 +9,6 @@ struct SessionDetailView: View {
     let sessionId: UUID
     @State private var session: Session?
 
-    // Checkpoint add
-    @State private var newCheckpointName = ""
-
     // Rider add
     @State private var showingAddRider = false
     @State private var riderFirstName = ""
@@ -64,21 +61,10 @@ struct SessionDetailView: View {
                 .onDelete { offsets in
                     deleteCheckpoints(offsets, from: session)
                 }
-
-                HStack {
-                    TextField("New checkpoint", text: $newCheckpointName)
-                        .textFieldStyle(.roundedBorder)
-                    Button {
-                        addCheckpoint(to: session)
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                    }
-                    .disabled(newCheckpointName.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
             } header: {
                 Text("Checkpoints (\(session.checkpoints.count))")
             } footer: {
-                Text("Start and Finish are created automatically. Add intermediate checkpoints here.")
+                Text("Start and Finish are created automatically. Additional checkpoints appear here when an official joins as a checkpoint.")
             }
 
             // MARK: - Riders section
@@ -138,37 +124,6 @@ struct SessionDetailView: View {
     }
 
     // MARK: - Checkpoint actions
-
-    private func addCheckpoint(to session: Session) {
-        let name = newCheckpointName.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { return }
-
-        // Insert before finish: new checkpoint gets second-to-last index.
-        let sorted = session.sortedCheckpoints
-        let insertIndex = max(sorted.count - 1, 1)
-
-        var payloads: [SyncPayload] = []
-
-        // Bump finish index if it collides with the new one.
-        if let finish = sorted.last, finish.indexInCourse == insertIndex {
-            payloads.append(.checkpointUpserted(CheckpointPayload(
-                checkpointId: finish.id,
-                sessionId: session.id,
-                indexInCourse: insertIndex + 1,
-                name: finish.name
-            )))
-        }
-
-        payloads.append(.checkpointUpserted(CheckpointPayload(
-            checkpointId: UUID(),
-            sessionId: session.id,
-            indexInCourse: insertIndex,
-            name: name
-        )))
-
-        syncCoordinator.apply(payloads)
-        newCheckpointName = ""
-    }
 
     private func deleteCheckpoints(_ offsets: IndexSet, from session: Session) {
         let sorted = session.sortedCheckpoints

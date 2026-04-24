@@ -111,21 +111,91 @@ struct FinishLineView: View {
     }
 
     private func deleteFinish(at offsets: IndexSet) {
+        guard let session, let cp = finishCheckpoint else { return }
+
+        // All non-deleted finish events for this session at the finish
+        // checkpoint, sorted by capture time. This is the canonical sequence
+        // we shift over when an accidental tap is removed.
+        var orderedEvents = session.runs
+            .flatMap(\.events)
+            .filter { $0.checkpoint?.id == cp.id && !$0.isTombstoned }
+            .sorted { $0.timestamp < $1.timestamp }
+
         var payloads: [SyncPayload] = []
-        for index in offsets {
-            let record = recentFinishes[index]
+
+        for offset in offsets {
+            let record = recentFinishes[offset]
+            guard let idx = orderedEvents.firstIndex(where: { $0.id == record.id }) else { continue }
+
+            // Snapshot the run-id chain before the shift so we can compute
+            // which runs are no longer assigned to any finish event.
+            let preRunIds = Set(orderedEvents.compactMap { $0.run?.id })
+
+            // Tombstone the deleted (accidental) event.
             payloads.append(.checkpointEventEdited(CheckpointEventEditPayload(
-                eventId: record.id,
+                eventId: orderedEvents[idx].id,
                 reassignedRunId: nil,
                 deleted: true,
                 ignored: nil,
                 manualOverride: nil,
                 note: nil
             )))
+
+            // Each later event slides up by one rider in the original chain.
+            // The rider who was previously last loses their finish (handled
+            // below via the run-id set diff).
+            for j in (idx + 1)..<orderedEvents.count {
+                if let prevRunId = orderedEvents[j - 1].run?.id {
+                    payloads.append(.checkpointEventEdited(CheckpointEventEditPayload(
+                        eventId: orderedEvents[j].id,
+                        reassignedRunId: prevRunId,
+                        deleted: nil,
+                        ignored: nil,
+                        manualOverride: nil,
+                        note: nil
+                    )))
+                }
+            }
+
+            // Compute the post-shift chain to find which run no longer has
+            // a finish event and revert its status to .started.
+            var postRunIds: Set<UUID> = []
+            for (i, e) in orderedEvents.enumerated() where i != idx {
+                let assigned = i < idx ? e.run?.id : orderedEvents[i - 1].run?.id
+                if let assigned { postRunIds.insert(assigned) }
+            }
+            for runId in preRunIds.subtracting(postRunIds) {
+                payloads.append(.runStatusChanged(RunStatusPayload(
+                    runId: runId,
+                    status: RunStatus.started.rawValue
+                )))
+            }
+
+            orderedEvents.remove(at: idx)
         }
+
         syncCoordinator.apply(payloads)
-        recentFinishes.remove(atOffsets: offsets)
+        rebuildRecentFinishes()
         rebuildExpected()
+    }
+
+    /// Re-derive `recentFinishes` from the current model state. Called after
+    /// any edit so the visible rider names reflect post-shift assignments.
+    private func rebuildRecentFinishes() {
+        guard let session, let cp = finishCheckpoint else { recentFinishes = []; return }
+        let events = session.runs
+            .flatMap(\.events)
+            .filter { $0.checkpoint?.id == cp.id && !$0.isTombstoned }
+            .sorted { $0.timestamp > $1.timestamp }
+
+        recentFinishes = events.map { event in
+            FinishRecord(
+                id: event.id,
+                riderName: event.run?.rider?.displayName ?? "Unknown",
+                timestamp: event.timestamp,
+                totalTime: event.run?.totalTime
+            )
+        }
     }
 
     // MARK: - Data
@@ -133,6 +203,7 @@ struct FinishLineView: View {
     private func loadData() {
         session = try? modelContext.fetchByID(Session.self, id: sessionId)
         finishCheckpoint = session?.sortedCheckpoints.last { $0.isFinish }
+        rebuildRecentFinishes()
         rebuildExpected()
     }
 

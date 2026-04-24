@@ -9,7 +9,7 @@ final class CheckpointEvent {
     var autoAssignedRiderId: UUID?
     var manualOverride: Bool
     var ignored: Bool
-    var deleted: Bool
+    var isTombstoned: Bool
     var note: String?
 
     var run: Run?
@@ -22,7 +22,7 @@ final class CheckpointEvent {
         autoAssignedRiderId: UUID? = nil,
         manualOverride: Bool = false,
         ignored: Bool = false,
-        deleted: Bool = false,
+        isTombstoned: Bool = false,
         note: String? = nil
     ) {
         self.id = id
@@ -31,7 +31,7 @@ final class CheckpointEvent {
         self.autoAssignedRiderId = autoAssignedRiderId
         self.manualOverride = manualOverride
         self.ignored = ignored
-        self.deleted = deleted
+        self.isTombstoned = isTombstoned
         self.note = note
     }
 }

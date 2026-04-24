@@ -79,6 +79,21 @@ struct CheckpointPayload: Codable, Sendable {
     var sessionId: UUID
     var indexInCourse: Int
     var name: String
+    var createdByDeviceId: String?
+
+    init(
+        checkpointId: UUID,
+        sessionId: UUID,
+        indexInCourse: Int,
+        name: String,
+        createdByDeviceId: String? = nil
+    ) {
+        self.checkpointId = checkpointId
+        self.sessionId = sessionId
+        self.indexInCourse = indexInCourse
+        self.name = name
+        self.createdByDeviceId = createdByDeviceId
+    }
 }
 
 struct RiderPayload: Codable, Sendable {
