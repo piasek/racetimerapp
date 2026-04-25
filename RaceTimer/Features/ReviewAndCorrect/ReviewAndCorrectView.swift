@@ -153,3 +153,13 @@ private struct RunDetailSheet: View {
         }
     }
 }
+
+#if DEBUG
+#Preview {
+    let scenario = PreviewSupport.makeScenario(riderCount: 6, startedCount: 6, finishedCount: 4)
+    NavigationStack {
+        ReviewAndCorrectView(sessionId: scenario.sessionId)
+    }
+    .previewEnvironment(scenario)
+}
+#endif

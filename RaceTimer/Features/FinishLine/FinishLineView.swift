@@ -233,3 +233,13 @@ private struct FinishRecord: Identifiable {
     let timestamp: Date
     let totalTime: TimeInterval?
 }
+
+#if DEBUG
+#Preview {
+    let scenario = PreviewSupport.makeScenario(riderCount: 6, startedCount: 5, finishedCount: 3, role: .finish)
+    NavigationStack {
+        FinishLineView(sessionId: scenario.sessionId)
+    }
+    .previewEnvironment(scenario)
+}
+#endif

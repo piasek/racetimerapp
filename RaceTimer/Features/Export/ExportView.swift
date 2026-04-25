@@ -105,3 +105,13 @@ struct ExportView: View {
         return String(format: "%d:%02d.%d", m, s, ms)
     }
 }
+
+#if DEBUG
+#Preview {
+    let scenario = PreviewSupport.makeScenario(riderCount: 6, startedCount: 6, finishedCount: 6)
+    NavigationStack {
+        ExportView(sessionId: scenario.sessionId)
+    }
+    .previewEnvironment(scenario)
+}
+#endif

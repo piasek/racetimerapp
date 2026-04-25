@@ -212,14 +212,16 @@ struct CheckpointCaptureView: View {
     private func rebuildExpected() {
         guard let session, let checkpoint else { expectedRiders = []; return }
         let cpId = checkpoint.id
-        // Riders with started runs who haven't passed this checkpoint yet
-        let startedRuns = session.runs.filter { $0.status == .started }
+        // Riders who haven't passed this checkpoint yet
+        // Note that we can't definitively know who started because we may not
+        // be syncing with the starting checkpoint.
+        let allRuns = session.runs
         let ridersAlreadyPassed = Set(
-            startedRuns.flatMap { $0.effectiveEvents }
+            allRuns.flatMap { $0.effectiveEvents }
                 .filter { $0.checkpoint?.id == cpId }
                 .compactMap { $0.run?.rider?.id }
         )
-        expectedRiders = startedRuns
+        expectedRiders = allRuns
             .compactMap { $0.rider }
             .filter { !ridersAlreadyPassed.contains($0.id) }
             .sorted { ($0.runs.first?.startTime ?? .distantFuture) < ($1.runs.first?.startTime ?? .distantFuture) }
@@ -232,3 +234,16 @@ struct CaptureRecord: Identifiable {
     let timestamp: Date
     let eventId: UUID
 }
+
+#if DEBUG
+#Preview {
+    let scenario = PreviewSupport.makeScenario(riderCount: 6, startedCount: 4, finishedCount: 0, role: .checkpoint)
+    NavigationStack {
+        CheckpointCaptureView(
+            sessionId: scenario.sessionId,
+            checkpointId: scenario.intermediateCheckpointId
+        )
+    }
+    .previewEnvironment(scenario)
+}
+#endif

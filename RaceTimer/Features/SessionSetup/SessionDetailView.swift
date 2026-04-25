@@ -46,26 +46,19 @@ struct SessionDetailView: View {
                         broadcastSessionEdits(session, name: editedName, notes: newValue)
                     }
             }
-
-            // MARK: - Checkpoints section
+            
+            // MARK: - Start Timing
             Section {
-                ForEach(session.sortedCheckpoints) { cp in
-                    HStack {
-                        Text(cp.name)
-                        Spacer()
-                        Text(checkpointBadge(cp))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                Button {
+                    path.append(Route.roleSelection(session.id))
+                } label: {
+                    Label("Start Timing", systemImage: "arrow.right.circle.fill")
+                        .frame(maxWidth: .infinity)
                 }
-                .onDelete { offsets in
-                    deleteCheckpoints(offsets, from: session)
-                }
-            } header: {
-                Text("Checkpoints (\(session.checkpoints.count))")
-            } footer: {
-                Text("Start and Finish are created automatically. Additional checkpoints appear here when an official joins as a checkpoint.")
+                .buttonStyle(.borderedProminent)
+                .disabled(session.checkpoints.count < 2 || session.riders.isEmpty)
             }
+            
 
             // MARK: - Riders section
             Section {
@@ -93,17 +86,26 @@ struct SessionDetailView: View {
                 Text("Riders (\(session.riders.count))")
             }
 
-            // MARK: - Continue
+            // MARK: - Checkpoints section
             Section {
-                Button {
-                    path.append(Route.roleSelection(session.id))
-                } label: {
-                    Label("Continue to Role Selection", systemImage: "arrow.right.circle.fill")
-                        .frame(maxWidth: .infinity)
+                ForEach(session.sortedCheckpoints) { cp in
+                    HStack {
+                        Text(cp.name)
+                        Spacer()
+                        Text(checkpointBadge(cp))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(session.checkpoints.count < 2 || session.riders.isEmpty)
+                .onDelete { offsets in
+                    deleteCheckpoints(offsets, from: session)
+                }
+            } header: {
+                Text("Checkpoints (\(session.checkpoints.count))")
+            } footer: {
+                Text("Start and Finish are created automatically. Additional checkpoints appear here when an official joins as a checkpoint.")
             }
+
         }
         .navigationTitle(session.name)
         .sheet(isPresented: $showingAddRider) {
@@ -224,3 +226,13 @@ struct SessionDetailView: View {
         return "CP \(cp.indexInCourse)"
     }
 }
+
+#if DEBUG
+#Preview {
+    let scenario = PreviewSupport.makeScenario()
+    NavigationStack {
+        SessionDetailView(path: .constant(NavigationPath()), sessionId: scenario.sessionId)
+    }
+    .previewEnvironment(scenario)
+}
+#endif

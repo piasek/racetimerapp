@@ -157,3 +157,13 @@ struct StartLineView: View {
         return String(format: "%d:%02d", s / 60, s % 60)
     }
 }
+
+#if DEBUG
+#Preview {
+    let scenario = PreviewSupport.makeScenario(riderCount: 6, startedCount: 2, finishedCount: 0, role: .start)
+    NavigationStack {
+        StartLineView(sessionId: scenario.sessionId)
+    }
+    .previewEnvironment(scenario)
+}
+#endif

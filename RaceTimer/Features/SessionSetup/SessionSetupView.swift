@@ -160,3 +160,13 @@ private struct SessionRow: View {
         return session.date.formatted(.dateTime.weekday().month().day().year())
     }
 }
+
+#if DEBUG
+#Preview {
+    let scenario = PreviewSupport.makeScenario()
+    NavigationStack {
+        SessionSetupView(path: .constant(NavigationPath()))
+    }
+    .previewEnvironment(scenario)
+}
+#endif

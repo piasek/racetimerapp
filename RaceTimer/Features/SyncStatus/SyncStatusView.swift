@@ -183,3 +183,20 @@ extension View {
         }
     }
 }
+
+#if DEBUG
+#Preview("Sheet") {
+    let scenario = PreviewSupport.makeScenario()
+    SyncStatusView()
+        .previewEnvironment(scenario)
+}
+
+#Preview("Bar") {
+    let scenario = PreviewSupport.makeScenario()
+    VStack(spacing: 0) {
+        SyncStatusBar()
+        Spacer()
+    }
+    .previewEnvironment(scenario)
+}
+#endif
